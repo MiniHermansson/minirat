@@ -574,17 +574,55 @@ function defaultState() {
 
 let S = defaultState();
 
-function load() {
+// ══════════════════════════════════════════════════
+//  FIREBASE
+// ══════════════════════════════════════════════════
+const FB_URL = 'https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app/draft.json';
+
+async function save() {
   try {
-    const d = localStorage.getItem('fd5');
-    if (d) {
-      S = JSON.parse(d);
-      while (S.games.length < 5) S.games.push({side1:'t1',winner:'',picks:[],bans:[]});
-      if (!S.bestOf) S.bestOf = 5;
-    }
-  } catch(e) {}
+    await fetch(FB_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(S)
+    });
+  } catch(e) { console.warn('Firebase save failed', e); }
 }
-function save() { localStorage.setItem('fd5', JSON.stringify(S)); }
+
+async function load() {
+  try {
+    const r = await fetch(FB_URL);
+    if (r.ok) {
+      const d = await r.json();
+      if (d) {
+        S = d;
+        while (S.games.length < 5) S.games.push({side1:'',winner:'',picks:[],bans:[]});
+        if (!S.bestOf) S.bestOf = 5;
+      }
+    }
+  } catch(e) { console.warn('Firebase load failed', e); }
+}
+
+// Poll every 3 seconds on the display page so viewers see live updates
+let pollInterval = null;
+function startLiveSync() {
+  if (pollInterval) return;
+  pollInterval = setInterval(async () => {
+    if (document.getElementById('view-display').classList.contains('hidden')) return;
+    try {
+      const r = await fetch(FB_URL);
+      if (r.ok) {
+        const d = await r.json();
+        if (d) {
+          S = d;
+          while (S.games.length < 5) S.games.push({side1:'',winner:'',picks:[],bans:[]});
+          if (!S.bestOf) S.bestOf = 5;
+          renderDisplay();
+        }
+      }
+    } catch(e) {}
+  }, 3000);
+}
 
 // Helper: given a game, which team is on "left" (t1 or t2) and which color is each team
 function gameSides(g) {
@@ -651,8 +689,8 @@ function setImgWithFallback(imgEl, name) {
 function show(id) { document.getElementById(id).classList.remove('hidden'); }
 function hide(id) { document.getElementById(id).classList.add('hidden'); }
 function showLogin()   { hide('view-display'); hide('view-admin'); show('view-login'); setTimeout(()=>document.getElementById('pw-input').focus(),50); }
-function showDisplay() { hide('view-login');  hide('view-admin'); show('view-display'); renderDisplay(); }
-function showAdmin()   { hide('view-login');  hide('view-display'); show('view-admin'); populateAdmin(); renderAdminList(); }
+function showDisplay() { hide('view-login');  hide('view-admin'); show('view-display'); renderDisplay(); startLiveSync(); }
+function showAdmin()   { hide('view-login');  hide('view-display'); show('view-admin'); populateAdmin(); }
 
 function doLogin() {
   if (document.getElementById('pw-input').value === PASS) {
@@ -1339,7 +1377,13 @@ function toast(msg) {
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePicker(); });
 
-load(); loadChamps(); showDisplay();
+async function init() {
+  await load();
+  loadChamps();
+  showDisplay();
+  startLiveSync();
+}
+init();
 </script>
 </body>
 </html>
