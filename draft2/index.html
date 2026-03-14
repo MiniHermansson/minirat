@@ -301,18 +301,33 @@ function renderGraveyard(){
   });
 }
 
-// Live poll every 3 seconds
-setInterval(async()=>{
-  try{
-    const r=await fetch(FB_URL);
-    if(r.ok){S=normaliseState(await r.json());renderDisplay();}
-  }catch(e){}
-},3000);
+// Firebase realtime listener — fires on every change from admin
+function initFirebase(){
+  const s = document.createElement('script');
+  s.type = 'module';
+  s.textContent = `
+    import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import{getDatabase,ref,onValue}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+    const app=initializeApp({apiKey:"AIzaSyCHx89HHT-nHlP7kcNCTT21-2S7jvI9G-c",authDomain:"miniratxyz.firebaseapp.com",databaseURL:"https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app",projectId:"miniratxyz",storageBucket:"miniratxyz.firebasestorage.app",messagingSenderId:"524360710142",appId:"1:524360710142:web:a99846767a02914a35b2af"},{name:'display'});
+    const db=getDatabase(app);
+    onValue(ref(db,'draft'),snap=>{
+      window._displaySnap=snap.val();
+      document.dispatchEvent(new Event('fb-display-update'));
+    });
+  `;
+  document.head.appendChild(s);
+  document.addEventListener('fb-display-update',()=>{
+    S=normaliseState(window._displaySnap);
+    renderDisplay();
+  });
+}
 
 async function init(){
   renderDisplay();
   loadChamps();
+  // Initial load via fetch for speed, then Firebase takes over
   try{const r=await fetch(FB_URL);if(r.ok){S=normaliseState(await r.json());renderDisplay();}}catch(e){}
+  initFirebase();
 }
 init();
 </script>

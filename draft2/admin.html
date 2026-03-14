@@ -360,11 +360,13 @@ let lastSavedAt = 0;
 
 async function save(){
   lastSavedAt = Date.now();
-  try{
-    const r=await fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(S)});
-    if(!r.ok)console.warn('save error',r.status);
-  }catch(e){console.warn('save failed',e);}
+  waitFB(async()=>{
+    try{
+      await window._set(window._ref(window._db,'draft'), S);
+    }catch(e){console.warn('save failed',e);}
+  });
 }
+
 async function load(){
   try{const r=await fetch(FB_URL);if(r.ok)S=normaliseState(await r.json());}catch(e){}
 }
@@ -436,11 +438,10 @@ function onSignedIn(user){
   document.getElementById('admin-panel').classList.remove('hidden');
   document.getElementById('chat-box').classList.remove('hidden');
   document.getElementById('l-pw').value='';
-  load().then(()=>{populateAdmin();});
   setupPresence(user);
   listenPresence();
   listenChat();
-  startAdminPoll();
+  startAdminPoll(); // onValue fires immediately and calls populateAdmin
   toast('Signed in as '+name);
 }
 
@@ -521,9 +522,7 @@ let _adminUnsub = null;
 function startAdminPoll(){
   stopAdminPoll();
   waitFB(()=>{
-    let firstCall = true; // skip the immediate initial fire — we already loaded on sign-in
     _adminUnsub = window._onValue(window._ref(window._db,'draft'), snap => {
-      if(firstCall){ firstCall=false; return; }
       // Skip if this is echoing our own recent save
       if(Date.now() - lastSavedAt < 8000) return;
       // Skip if picker is open
