@@ -516,6 +516,8 @@ async function sendChat(){
 function startAdminPoll(){
   stopAdminPoll();
   adminPollInterval=setInterval(async()=>{
+    // Don't sync while the picker is open — would discard in-progress selection
+    if(!document.getElementById('picker-overlay').classList.contains('hidden')) return;
     try{
       const r=await fetch(FB_URL);
       if(r.ok){
@@ -523,7 +525,7 @@ function startAdminPoll(){
         if(JSON.stringify(newS)!==JSON.stringify(S)){S=newS;populateAdmin();toast('Updated by another admin');}
       }
     }catch(e){}
-  },4000);
+  },8000);
 }
 function stopAdminPoll(){if(adminPollInterval){clearInterval(adminPollInterval);adminPollInterval=null;}}
 
