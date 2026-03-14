@@ -155,15 +155,21 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
   text-align:center;line-height:1.2;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 /* CHAT */
-.chat-box{position:fixed;bottom:0;right:0;width:280px;background:var(--surface);
+.chat-box{position:fixed;bottom:0px;right:0;width:280px;height:400px;min-width:280px;min-height:260px;background:var(--surface);
   border:1px solid var(--border);border-bottom:none;border-right:none;z-index:500;display:flex;flex-direction:column;
-  box-shadow:0 8px 32px rgba(0,0,0,0.5);}
-.chat-header{display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);overflow:hidden;}
+.chat-box.minimized{height:40px!important;min-height:40px!important;bottom:-10px;}
+.chat-box.minimized .chat-messages,.chat-box.minimized .chat-input-row{display:none!important;}
+.chat-box.minimized .chat-resize-handle{display:none!important;}
+.chat-resize-handle{position:absolute;top:0;left:0;width:20px;height:20px;cursor:nwse-resize;z-index:10;
+  background:linear-gradient(135deg,var(--gold-dim) 0%,transparent 50%);opacity:0.6;}
+.chat-resize-handle:hover{opacity:1;}
+.chat-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
   padding:8px 12px;background:var(--surface2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
 .chat-header-title{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:3px;color:var(--gold);}
 .chat-header-count{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--red);}
-.chat-messages{height:180px;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:5px;}
-.chat-messages.collapsed{height:0;padding:0;overflow:hidden;}
+.chat-messages{min-height:180px;flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:5px;}
+.chat-messages.collapsed{height:0!important;min-height:0!important;padding:0;overflow:hidden;flex:0 0 0;}
 .chat-messages::-webkit-scrollbar{width:3px;}
 .chat-messages::-webkit-scrollbar-thumb{background:var(--gold-dim);}
 .chat-msg{display:flex;flex-direction:column;gap:1px;}
@@ -285,6 +291,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
 
 <!-- CHAT -->
 <div class="chat-box hidden" id="chat-box">
+  <div class="chat-resize-handle" id="chat-resize-handle" title="Drag to resize"></div>
   <div class="chat-header" onclick="toggleChat()">
     <div class="chat-header-title">TEAM CHAT</div>
     <div class="chat-header-count" id="chat-unread"></div>
@@ -503,6 +510,7 @@ function listenChat(){
 }
 function toggleChat(){
   chatCollapsed=!chatCollapsed;
+  document.getElementById('chat-box').classList.toggle('minimized',chatCollapsed);
   document.getElementById('chat-messages').classList.toggle('collapsed',chatCollapsed);
   document.getElementById('chat-input-row').classList.toggle('collapsed',chatCollapsed);
   if(!chatCollapsed){unreadCount=0;document.getElementById('chat-unread').textContent='';const c=document.getElementById('chat-messages');c.scrollTop=c.scrollHeight;}
@@ -516,6 +524,32 @@ async function sendChat(){
   const colour=pColour(currentUser.uid);
   waitFB(async()=>{await window._push(window._ref(window._db,'chat'),{text,name,colour,ts:Date.now()});});
 }
+
+// ── CHAT RESIZE (top-left handle) ──
+(function(){
+  const MIN_W=280,MIN_H=260,MAX_W=500,MAX_H=800;
+  const DRAG_THRESHOLD=5;
+  const box=document.getElementById('chat-box');
+  const handle=document.getElementById('chat-resize-handle');
+  if(!box||!handle)return;
+  handle.addEventListener('mousedown',e=>{e.preventDefault();e.stopPropagation();
+    const startX=e.clientX,startY=e.clientY;
+    const startW=box.offsetWidth,startH=box.offsetHeight;
+    let didDrag=false;
+    function move(ev){
+      const dx=ev.clientX-startX,dy=ev.clientY-startY;
+      if(Math.abs(dx)>DRAG_THRESHOLD||Math.abs(dy)>DRAG_THRESHOLD)didDrag=true;
+      const w=Math.min(MAX_W,Math.max(MIN_W,startW+(startX-ev.clientX)));
+      const h=Math.min(MAX_H,Math.max(MIN_H,startH+(startY-ev.clientY)));
+      box.style.width=w+'px';box.style.height=h+'px';
+    }
+    function stop(ev){
+      document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',stop);
+      if(!didDrag)toggleChat();
+    }
+    document.addEventListener('mousemove',move);document.addEventListener('mouseup',stop);
+  });
+})();
 
 // ── ADMIN LIVE SYNC ──
 let _adminUnsub = null;
