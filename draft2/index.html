@@ -198,8 +198,7 @@ function buildGameBlock(g,gi){
   const redBans=g.bans.filter(b=>b.side===redTeam);
 
   const block=document.createElement('div'); block.className='game-block';
-  const hasContent=g.picks.length>0||g.bans.length>0;
-  if(displayCollapsed[gi]===undefined) displayCollapsed[gi]=!hasContent;
+  if(displayCollapsed[gi]===undefined) displayCollapsed[gi]=false; // always expanded by default
   let collapsed=displayCollapsed[gi];
 
   const lbl=document.createElement('div');

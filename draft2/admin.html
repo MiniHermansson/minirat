@@ -159,8 +159,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
   text-align:center;line-height:1.2;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 /* CHAT */
-.chat-box{position:fixed;bottom:20px;right:20px;width:280px;background:var(--surface);
-  border:1px solid var(--border);z-index:500;display:flex;flex-direction:column;
+.chat-box{position:fixed;bottom:0;right:0;width:280px;background:var(--surface);
+  border:1px solid var(--border);border-bottom:none;border-right:none;z-index:500;display:flex;flex-direction:column;
   box-shadow:0 8px 32px rgba(0,0,0,0.5);}
 .chat-header{display:flex;align-items:center;justify-content:space-between;
   padding:8px 12px;background:var(--surface2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
@@ -438,6 +438,10 @@ function onSignedIn(user){
   document.getElementById('admin-panel').classList.remove('hidden');
   document.getElementById('chat-box').classList.remove('hidden');
   document.getElementById('l-pw').value='';
+  // Record session start time — only show chat messages from this session onward
+  if(!sessionStorage.getItem('chatSessionStart')){
+    sessionStorage.setItem('chatSessionStart', Date.now());
+  }
   setupPresence(user);
   listenPresence();
   listenChat();
@@ -480,8 +484,11 @@ function listenPresence(){
 function listenChat(){
   waitFB(()=>{
     window._onValue(window._ref(window._db,'chat'),snap=>{
+      const sessionStart = parseInt(sessionStorage.getItem('chatSessionStart')||'0');
       const data=snap.val()||{};
-      const msgs=Object.values(data).sort((a,b)=>(a.ts||0)-(b.ts||0));
+      const msgs=Object.values(data)
+        .filter(m=>(m.ts||0) >= sessionStart)
+        .sort((a,b)=>(a.ts||0)-(b.ts||0));
       const newCount=msgs.length;
       if(newCount>chatMsgCount&&chatMsgCount>0&&chatCollapsed){
         unreadCount+=(newCount-chatMsgCount);
