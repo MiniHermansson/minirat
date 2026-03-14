@@ -1,0 +1,14 @@
+---
+description: After making code changes, commit and push to Git
+alwaysApply: true
+---
+
+# Git: Commit and push after changes
+
+When you complete code changes in this project:
+
+1. **Stage** all modified/new files: `git add -A` (or `git add .` from repo root).
+2. **Commit** with a short, descriptive message: `git commit -m "Brief description of what changed"`.
+3. **Push** to the current branch: `git push`.
+
+Do this at the end of your response when you have made file edits. If the user has no remote or prefers not to push, skip the push step. If there are no changes (e.g. nothing was edited), do not run these commands.

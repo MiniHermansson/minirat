@@ -125,10 +125,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
 .adg-ban-slot:hover{border-color:rgba(255,80,80,0.4);}
 .adg-ban-slot img{width:115%;height:115%;object-fit:cover;object-position:top center;margin:-7% 0 0 -7%;
   filter:grayscale(0.5) brightness(0.55) sepia(0.3);}
-.adg-ban-slot::after{content:'✕';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:900;color:rgba(220,40,50,0);transition:color .1s;}
-.adg-ban-slot.filled::after{color:rgba(220,40,50,0.85);}
-.adg-ban-slot:hover::after{color:rgba(255,80,80,0.9)!important;}
 .adg-add-ban{width:34px;height:34px;border:1px dashed rgba(212,168,67,0.3);background:rgba(212,168,67,0.02);
   display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(212,168,67,0.5);
   font-size:16px;transition:all .15s;flex-shrink:0;}
@@ -241,8 +237,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
       <div class="form-row">
         <div class="fg"><div class="flabel">Team 1 Name</div><input class="fi" id="a-t1" placeholder="Team Alpha"></div>
         <div class="fg"><div class="flabel">Team 2 Name</div><input class="fi" id="a-t2" placeholder="Team Omega"></div>
-        <div class="fg"><div class="flabel">Team 1 Score</div><input class="fi" id="a-s1" type="number" min="0" max="5" value="0"></div>
-        <div class="fg"><div class="flabel">Team 2 Score</div><input class="fi" id="a-s2" type="number" min="0" max="5" value="0"></div>
         <div class="fg"><div class="flabel">Best of</div>
           <select class="fs" id="a-bestof"><option value="1">BO1</option><option value="3">BO3</option><option value="5" selected>BO5</option></select>
         </div>
@@ -553,8 +547,6 @@ function stopAdminPoll(){
 function populateAdmin(){
   document.getElementById('a-t1').value=S.team1;
   document.getElementById('a-t2').value=S.team2;
-  document.getElementById('a-s1').value=S.score1;
-  document.getElementById('a-s2').value=S.score2;
   document.getElementById('a-bestof').value=String(S.bestOf);
   renderSideSelection();
   renderPostGame();
@@ -677,8 +669,6 @@ function buildAdminSide(gi,side,colorClass){
 function saveSettings(){
   S.team1=document.getElementById('a-t1').value.trim()||'TEAM 1';
   S.team2=document.getElementById('a-t2').value.trim()||'TEAM 2';
-  S.score1=parseInt(document.getElementById('a-s1').value)||0;
-  S.score2=parseInt(document.getElementById('a-s2').value)||0;
   S.bestOf=parseInt(document.getElementById('a-bestof').value)||5;
   save();populateAdmin();toast('Settings saved');
 }
@@ -707,6 +697,11 @@ function buildPickerGrid(query){
   const used=new Set();
   S.games[gi].picks.forEach(p=>used.add(p.champion.toLowerCase()));
   S.games[gi].bans.forEach(b=>used.add(b.champion.toLowerCase()));
+  // For picks, also exclude champions picked in any previous game in the series
+  if(pickerCtx&&pickerCtx.type==='pick'){
+    for(let i=0;i<gi;i++)
+      S.games[i].picks.forEach(p=>used.add(p.champion.toLowerCase()));
+  }
   const q=query.trim().toLowerCase().replace(/'/g,'');
   const filtered=q?ALL_CHAMPS.filter(c=>c.name.toLowerCase().replace(/'/g,'').includes(q)):ALL_CHAMPS;
   const grid=document.getElementById('picker-grid');grid.innerHTML='';

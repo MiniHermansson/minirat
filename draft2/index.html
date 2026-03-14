@@ -80,7 +80,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
   padding:3px 9px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s;z-index:300;}
 .ci:hover .ctip{opacity:1;}
 .ci.ban .ci-img-wrap img{filter:grayscale(0.6) brightness(0.55) sepia(0.4);}
-.ci.ban .ci-img-wrap::after{content:'';position:absolute;inset:0;background:rgba(200,20,20,0.52);}
+.ci.ban .ci-img-wrap::after{content:'';position:absolute;inset:0;background:rgba(200,20,20,0.28);}
 .ci.sm .ci-img-wrap{width:32px;height:32px;}
 .ci.sm{width:32px;height:32px;}
 .ci.sm img{width:115%;height:115%;}
@@ -140,7 +140,6 @@ let DD = '15.1.1';
 const CM = {}, CD_ID = {};
 let ALL_CHAMPS = [];
 let S = defaultState();
-const displayCollapsed = {};
 
 function defaultState() {
   return { team1:'TEAM 1', team2:'TEAM 2', score1:0, score2:0, bestOf:5,
@@ -198,8 +197,8 @@ function buildGameBlock(g,gi){
   const redBans=g.bans.filter(b=>b.side===redTeam);
 
   const block=document.createElement('div'); block.className='game-block';
-  if(displayCollapsed[gi]===undefined) displayCollapsed[gi]=false; // always expanded by default
-  let collapsed=displayCollapsed[gi];
+  const hasContent=(g.picks&&g.picks.length>0)||(g.bans&&g.bans.length>0);
+  let collapsed=gi===0?false:!hasContent; // game 1 always expanded; others expanded only if they have picks/bans
 
   const lbl=document.createElement('div');
   lbl.className='game-lbl'+(collapsed?' collapsed':'');
@@ -240,7 +239,7 @@ function buildGameBlock(g,gi){
   block.appendChild(body);
 
   lbl.addEventListener('click',()=>{
-    collapsed=!collapsed; displayCollapsed[gi]=collapsed;
+    collapsed=!collapsed;
     lbl.classList.toggle('collapsed',collapsed);
     if(collapsed){body.style.maxHeight=body.scrollHeight+'px';requestAnimationFrame(()=>{body.style.maxHeight='0px';});body.classList.add('collapsed');}
     else{body.classList.remove('collapsed');body.style.maxHeight='600px';}
@@ -269,7 +268,6 @@ function makeCI(name,isBan,role='',small=false){
   const iw=document.createElement('div'); iw.className='ci-img-wrap';
   if(small){iw.style.width='32px';iw.style.height='32px';}
   const img=document.createElement('img'); setImg(img,name); iw.appendChild(img); wrap.appendChild(iw);
-  if(isBan){const x=document.createElement('div');x.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:'+(small?'12px':'16px')+';font-weight:900;color:rgba(255,60,60,0.92);text-shadow:0 0 6px rgba(200,0,0,0.7);pointer-events:none;z-index:2;';x.textContent='✕';wrap.appendChild(x);}
   const tip=document.createElement('div'); tip.className='ctip'; tip.textContent=name+(role?' · '+role:''); wrap.appendChild(tip);
   return wrap;
 }
