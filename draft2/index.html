@@ -20,20 +20,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     radial-gradient(ellipse 70% 30% at 50% 0%,rgba(212,168,67,0.10) 0%,transparent 60%),
     radial-gradient(ellipse 30% 80% at 0% 50%,rgba(77,196,245,0.08) 0%,transparent 55%),
     radial-gradient(ellipse 30% 80% at 100% 50%,rgba(245,85,85,0.08) 0%,transparent 55%);}
-.hidden{display:none!important;}
-#view-display,#view-admin,#view-login{position:relative;z-index:1;}
-
-/* ── NAV ── */
 nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24px;
-  border-bottom:1px solid var(--border);background:rgba(8,8,14,0.93);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);background:rgba(7,7,13,0.95);backdrop-filter:blur(10px);
   position:sticky;top:0;z-index:200;}
 .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:var(--gold);}
 .nav-logo span{color:rgba(208,208,224,0.7);font-size:11px;letter-spacing:2px;}
 .nav-btn{background:none;border:1px solid var(--border);color:var(--text);font-family:'Rajdhani',sans-serif;
-  font-size:12px;letter-spacing:1.5px;padding:5px 16px;cursor:pointer;transition:all .2s;}
+  font-size:12px;letter-spacing:1.5px;padding:5px 16px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
 .nav-btn:hover{border-color:var(--gold);color:var(--gold);}
-
-/* ── SERIES HEADER ── */
 .series-header{display:flex;align-items:center;justify-content:center;gap:18px;padding:14px 24px 10px;}
 .team-hero{font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,3vw,38px);letter-spacing:3px;min-width:130px;color:#F0E6BE;}
 .team-hero.t1{text-align:right;}
@@ -41,394 +35,75 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
 .score-block{text-align:center;flex-shrink:0;}
 .score-nums{font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,4vw,46px);letter-spacing:6px;color:#F0E6BE;line-height:1;}
 .score-lbl{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--gold);margin-top:2px;opacity:0.75;}
-
-/* ── GAMES STACK ── */
 .games-stack{display:flex;flex-direction:column;gap:10px;padding:0 14px 10px;max-width:1100px;margin:0 auto;}
-
-/* ── GAME BLOCK: banner + row ── */
 .game-block{display:flex;flex-direction:column;}
-
-/* collapsible body */
 .game-body{overflow:hidden;transition:max-height .28s ease;display:flex;flex-direction:column;}
 .game-body.collapsed{max-height:0!important;}
-
-/* clickable game label */
-.game-lbl{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:4px 18px;
-  background:var(--surface2);
-  border:1px solid var(--border);
-  border-bottom:none;
-  align-self:center;
+.game-lbl{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:4px 18px;
+  background:var(--surface2);border:1px solid var(--border);border-bottom:none;align-self:center;
   font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:var(--gold);
-  cursor:pointer;user-select:none;transition:background .15s;
-}
-.game-lbl:hover{background:rgba(200,155,60,0.1);}
+  cursor:pointer;user-select:none;transition:background .15s;}
+.game-lbl:hover{background:rgba(212,168,67,0.1);}
 .game-lbl .collapse-arrow{font-size:9px;color:var(--gold-dim);transition:transform .25s;}
 .game-lbl.collapsed .collapse-arrow{transform:rotate(-90deg);}
-
-/* three-part header: [blue team] [GAME N] [red team] */
-.game-header{
-  display:grid;
-  grid-template-columns:1fr 6px 1fr;
-  border:1px solid var(--border);
-  border-bottom:none;
-}
-.game-header-team{
-  display:flex;align-items:center;justify-content:center;
-  padding:4px 14px;
-  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;
-}
-.game-header-team.blue{
-  color:var(--blue);background:var(--blue-bg);
-}
-.game-header-team.red{
-  color:var(--red);background:var(--red-bg);
-}
-.game-header-mid{
-  display:flex;align-items:center;justify-content:center;
-  padding:4px 0;
-  background:var(--surface2);
-  border-left:1px solid var(--border);
-  border-right:1px solid var(--border);
-  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:var(--gold);
-  white-space:nowrap;overflow:hidden;
-  font-size:0; /* hide text — just acts as the divider line */
-}
-.game-footer{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:5px 14px;
-  border:1px solid var(--border);
-  border-top:none;
-  align-self:center;
-  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;
-}
+.game-header{display:grid;grid-template-columns:1fr 6px 1fr;border:1px solid var(--border);border-bottom:none;}
+.game-header-team{display:flex;align-items:center;justify-content:center;padding:4px 14px;
+  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;}
+.game-header-team.blue{color:var(--blue);background:var(--blue-bg);}
+.game-header-team.red{color:var(--red);background:var(--red-bg);}
+.game-header-mid{background:var(--surface2);border-left:1px solid var(--border);border-right:1px solid var(--border);}
+.game-footer{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:5px 14px;
+  border:1px solid var(--border);border-top:none;align-self:center;
+  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;}
 .game-footer.tbd{background:var(--surface2);color:rgba(208,208,224,0.65);}
-.game-footer.win-t1{background:rgba(212,168,67,0.18);border-color:rgba(212,168,67,0.6);color:var(--gold);}
-.game-footer.win-t2{background:rgba(212,168,67,0.18);border-color:rgba(212,168,67,0.6);color:var(--gold);}
-.game-banner-num{
-  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:var(--gold);
-}
-.game-banner-winner{
-  font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:2px;
-  padding:1px 8px;border:1px solid;
-}
-.game-banner-winner.t1{color:var(--blue);border-color:var(--blue-border);background:var(--blue-bg);}
-.game-banner-winner.t2{color:var(--red);border-color:var(--red-border);background:var(--red-bg);}
-.game-banner-winner.tbd{color:var(--dim);border-color:rgba(200,155,60,0.12);font-size:8px;}
-
-/* ── GAME ROW ── */
-.game-row{
-  display:grid;
-  /* left-team | center-divider | right-team */
-  grid-template-columns:1fr 6px 1fr;
-  background:var(--surface);border:1px solid var(--border);
-  min-height:80px;transition:border-color .25s;
-}
-
-/* center divider */
-.game-divider{
-  background:var(--surface2);
-  border-left:1px solid var(--border);
-  border-right:1px solid var(--border);
-}
-
-/* team columns */
+.game-footer.won{background:rgba(212,168,67,0.18);border-color:rgba(212,168,67,0.6);color:var(--gold);}
+.game-row{display:grid;grid-template-columns:1fr 6px 1fr;background:var(--surface);border:1px solid var(--border);min-height:80px;}
+.game-divider{background:var(--surface2);border-left:1px solid var(--border);border-right:1px solid var(--border);}
 .team-col{display:flex;flex-direction:column;justify-content:flex-start;padding:8px 12px;gap:5px;}
 .team-col.t1{background:var(--blue-bg);}
 .team-col.t2{background:var(--red-bg);}
-.tc-label{
-  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;
-  display:inline-flex;align-items:center;
-  padding:3px 10px;
-  border:1px solid;
-  margin-bottom:6px;
-  align-self:flex-start;
-}
-.tc-label.t1{color:var(--blue);border-color:var(--blue-border);background:var(--blue-bg);}
-.tc-label.t2{color:var(--red);border-color:var(--red-border);background:var(--red-bg);}
-/* 5 pick slots always shown in role order */
 .tc-picks{display:flex;gap:6px;align-items:flex-start;justify-content:center;}
 .pick-slot{display:flex;flex-direction:column;align-items:center;gap:2px;width:52px;}
-.pick-slot-name{
-  font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.3px;
-  color:rgba(210,210,228,0.9);text-align:center;
-  max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  height:13px;
-}
-.pick-slot-role{
-  font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:1.5px;
-  color:rgba(212,168,67,0.65);text-transform:uppercase;text-align:center;height:10px;
-}
+.pick-slot-name{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;color:rgba(210,210,228,0.9);
+  text-align:center;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;height:13px;}
+.pick-slot-role{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:1.5px;
+  color:rgba(212,168,67,0.65);text-transform:uppercase;text-align:center;height:10px;}
 .pick-slot-empty .ci-img-wrap{opacity:0.15;}
 .tc-bans{display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin-top:5px;}
-.tc-bans-lbl{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;
-  color:rgba(212,168,67,0.65);margin-right:3px;flex-shrink:0;}
-
-/* ── CHAMP ICONS ── */
-.ci{
-  position:relative;
-  width:44px;height:44px;
-  border:1px solid rgba(255,255,255,0.15);
-  overflow:visible; /* allow tooltip to overflow */
-  flex-shrink:0;
-}
-/* clip the image but allow tooltip outside */
-.ci-img-wrap{
-  width:44px;height:44px;
-  overflow:hidden;
-  position:relative;
-}
+.tc-bans-lbl{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(212,168,67,0.65);margin-right:3px;flex-shrink:0;}
+.ci{position:relative;width:44px;height:44px;border:1px solid rgba(255,255,255,0.15);overflow:visible;flex-shrink:0;}
+.ci-img-wrap{width:44px;height:44px;overflow:hidden;position:relative;}
 .ci img{width:115%;height:115%;object-fit:cover;object-position:top center;margin:-7% 0 0 -7%;display:block;}
-
-/* tooltip */
-.ci .ctip{
-  position:absolute;
-  bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);
+.ci .ctip{position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);
   background:#0A0A0F;border:1px solid var(--gold);color:var(--gold);
   font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.5px;
-  padding:3px 9px;white-space:nowrap;
-  pointer-events:none;opacity:0;transition:opacity .12s;
-  z-index:300;
-}
+  padding:3px 9px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s;z-index:300;}
 .ci:hover .ctip{opacity:1;}
-
-/* BAN icons — noticeably different: red tint overlay, visible but clearly banned */
 .ci.ban .ci-img-wrap img{filter:grayscale(0.6) brightness(0.55) sepia(0.4);}
-.ci.ban .ci-img-wrap::after{
-  content:'';position:absolute;inset:0;
-  background:rgba(200,20,20,0.52);
-}
-.ci.ban-x{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;font-weight:900;
-  color:rgba(255,60,60,0.92);
-  text-shadow:0 0 6px rgba(200,0,0,0.7);
-  pointer-events:none;
-  z-index:2;
-}
-
-/* small variant for bans */
+.ci.ban .ci-img-wrap::after{content:'';position:absolute;inset:0;background:rgba(200,20,20,0.52);}
 .ci.sm .ci-img-wrap{width:32px;height:32px;}
 .ci.sm{width:32px;height:32px;}
 .ci.sm img{width:115%;height:115%;}
-
-/* ── GRAVEYARD ── */
 .graveyard{max-width:1500px;margin:0 auto;padding:8px 14px 28px;border-top:1px solid var(--border);}
 .grave-hdr{display:flex;align-items:center;gap:12px;padding:8px 0;}
 .grave-title{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;color:var(--gold);white-space:nowrap;}
 .grave-line{flex:1;height:1px;background:linear-gradient(to right,var(--gold-dim),transparent);}
 .grave-count{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gold);}
-.grave-role-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
-.grave-role-lbl{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:3px;
-  color:rgba(200,155,60,0.35);width:62px;flex-shrink:0;text-align:right;padding-right:8px;
-  border-right:1px solid rgba(200,155,60,0.12);}
 .grave-role-row{display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:12px;}
-.grave-role-lbl{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:3px;
-  color:rgba(212,168,67,0.75);text-align:center;padding-bottom:4px;
-  width:100%;max-width:600px;
-  border:none;
-  background-image:linear-gradient(to right, transparent, rgba(212,168,67,0.3) 20%, rgba(212,168,67,0.3) 80%, transparent);
-  background-size:100% 1px;
-  background-repeat:no-repeat;
-  background-position:bottom;
-}
+.grave-role-lbl{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:3px;color:rgba(212,168,67,0.75);
+  text-align:center;padding-bottom:4px;width:100%;max-width:600px;border:none;
+  background-image:linear-gradient(to right,transparent,rgba(212,168,67,0.3) 20%,rgba(212,168,67,0.3) 80%,transparent);
+  background-size:100% 1px;background-repeat:no-repeat;background-position:bottom;}
 .grave-chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;}
-/* graveyard icon */
-.gchip{
-  position:relative;
-  width:32px;height:32px;
-  overflow:visible;
-  cursor:default;flex-shrink:0;
-}
-.gchip img{
-  width:32px;height:32px;
-  object-fit:cover;object-position:top center;
-  display:block;
-  filter:grayscale(0.2) brightness(0.9);
-  border:1px solid rgba(200,155,60,0.12);
-  transition:filter .15s,border-color .15s;
-}
+.gchip{position:relative;width:32px;height:32px;overflow:visible;cursor:default;flex-shrink:0;}
+.gchip img{width:32px;height:32px;object-fit:cover;object-position:top center;display:block;
+  filter:grayscale(0.2) brightness(0.9);border:1px solid rgba(212,168,67,0.12);transition:filter .15s,border-color .15s;}
 .gchip:hover img{filter:none;border-color:var(--gold-dim);}
-.gchip .gtip{
-  position:absolute;
-  bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);
-  background:#0A0A0F;border:1px solid var(--gold-dim);
-  color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:0.5px;padding:3px 8px;white-space:nowrap;
-  pointer-events:none;opacity:0;transition:opacity .12s;z-index:300;
-}
+.gchip .gtip{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);
+  background:#0A0A0F;border:1px solid var(--gold-dim);color:var(--gold);
+  font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.5px;
+  padding:3px 8px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s;z-index:300;}
 .gchip:hover .gtip{opacity:1;}
-.gchip-g{display:none;}
-
-/* ── LOGIN ── */
-#view-login{display:flex;align-items:center;justify-content:center;min-height:100vh;}
-.login-box{background:var(--surface);border:1px solid var(--border);padding:36px 44px;text-align:center;min-width:300px;}
-.login-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:var(--gold);margin-bottom:4px;}
-.login-sub{font-size:11px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:22px;}
-.li{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);
-  font-family:'Rajdhani',sans-serif;font-size:14px;padding:8px 10px;outline:none;margin-bottom:12px;}
-.li:focus{border-color:var(--gold);}
-.login-btn{width:100%;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:3px;padding:9px;
-  cursor:pointer;background:rgba(200,155,60,0.1);border:1px solid var(--gold);color:var(--gold);transition:all .2s;}
-.login-btn:hover{background:rgba(200,155,60,0.22);}
-.login-err{color:#cc3344;font-size:11px;margin-top:8px;letter-spacing:1px;}
-.disp-lnk{margin-top:14px;font-size:12px;color:var(--dim);cursor:pointer;letter-spacing:1px;
-  text-decoration:underline;text-underline-offset:3px;}
-.disp-lnk:hover{color:var(--gold);}
-
-/* ── ADMIN ── */
-#view-admin{max-width:1100px;margin:0 auto;padding:20px 16px 60px;}
-.admin-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:var(--gold);}
-.admin-sub{font-size:11px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:20px;}
-.asec{background:var(--surface);border:1px solid var(--border);padding:16px;margin-bottom:14px;}
-.asec-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--gold);
-  padding-bottom:9px;margin-bottom:12px;border-bottom:1px solid var(--border);}
-.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin-bottom:9px;}
-.fg{display:flex;flex-direction:column;gap:3px;}
-.flabel{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;}
-.fi,.fs{background:var(--bg);border:1px solid var(--border);color:var(--text);
-  font-family:'Rajdhani',sans-serif;font-size:13px;padding:7px 9px;outline:none;transition:border-color .2s;}
-.fi:focus,.fs:focus{border-color:var(--gold);}
-.fs option{background:var(--bg);}
-.abtn{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;padding:7px 18px;
-  cursor:pointer;border:1px solid;transition:all .2s;}
-.abtn.primary{background:rgba(200,155,60,0.12);border-color:var(--gold);color:var(--gold);}
-.abtn.primary:hover{background:rgba(200,155,60,0.24);}
-.abtn.danger{background:rgba(200,0,0,0.07);border-color:rgba(200,0,0,0.38);color:#cc3344;font-size:11px;padding:4px 12px;}
-.abtn.danger:hover{background:rgba(200,0,0,0.17);}
-.erow{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid rgba(200,155,60,0.06);font-size:11px;}
-.erow:last-child{border-bottom:none;}
-.ebadge{font-family:'Share Tech Mono',monospace;font-size:8px;padding:2px 6px;border:1px solid;}
-.ebadge.t1{color:var(--blue);border-color:var(--blue-border);}
-.ebadge.t2{color:var(--red);border-color:var(--red-border);}
-.ebadge.ban{color:#cc3344;border-color:rgba(200,0,0,0.33);}
-.echamp{flex:1;font-weight:700;color:#F0E6BE;}
-.erole{font-size:9px;color:var(--gold-dim);letter-spacing:1px;}
-.egrp{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:3px;color:rgba(200,155,60,0.32);padding:7px 0 2px;}
-
-/* ── CHAMP PICKER MODAL ── */
-#picker-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.8);
-  display:flex;align-items:center;justify-content:center;
-  z-index:1000;backdrop-filter:blur(4px);
-}
-.picker-box{
-  background:var(--surface);border:1px solid var(--border);
-  width:min(700px,96vw);max-height:88vh;display:flex;flex-direction:column;
-}
-.picker-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:13px 16px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;
-}
-.picker-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:3px;color:var(--gold);}
-.picker-close{background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer;padding:0 4px;line-height:1;transition:color .15s;}
-.picker-close:hover{color:var(--gold);}
-.picker-search-wrap{padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.picker-search{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);
-  font-family:'Rajdhani',sans-serif;font-size:14px;padding:8px 12px;outline:none;}
-.picker-search:focus{border-color:var(--gold);}
-.picker-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));
-  gap:4px;padding:10px;overflow-y:auto;flex:1;
-}
-.picker-grid::-webkit-scrollbar{width:4px;}
-.picker-grid::-webkit-scrollbar-track{background:transparent;}
-.picker-grid::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px;}
-.pchamp{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  cursor:pointer;padding:5px 3px;border:1px solid transparent;
-  transition:all .12s;background:var(--surface2);
-}
-.pchamp:hover{border-color:var(--gold-dim);background:var(--gold-bg);}
-.pchamp.unavailable{opacity:0.2;pointer-events:none;}
-.pchamp img{width:48px;height:48px;object-fit:cover;object-position:top center;}
-.pchamp-name{font-family:'Rajdhani',sans-serif;font-size:8px;font-weight:700;letter-spacing:0.3px;
-  color:var(--text);text-align:center;line-height:1.2;max-width:60px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-/* ── ADMIN DRAFT GRID ── */
-.adg-game{margin-bottom:8px;border:1px solid var(--border);}
-.adg-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 12px;background:var(--surface2);
-  cursor:pointer;user-select:none;border-bottom:1px solid var(--border);
-  transition:background .15s;
-}
-.adg-header:hover{background:rgba(200,155,60,0.08);}
-.adg-header-left{display:flex;align-items:center;gap:10px;}
-.adg-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--gold);}
-.adg-summary{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px;}
-.adg-arrow{font-size:10px;color:var(--gold);transition:transform .22s;}
-.adg-arrow.collapsed{transform:rotate(-90deg);}
-.adg-body{overflow:hidden;transition:max-height .25s ease;display:flex;flex-direction:column;}
-.adg-body.collapsed{max-height:0!important;}
-.adg-sides{display:grid;grid-template-columns:1fr 1px 1fr;background:var(--surface);}
-.adg-divider{background:var(--border);}
-.adg-side{padding:10px 12px;display:flex;flex-direction:column;gap:8px;}
-.adg-side.blue{background:var(--blue-bg);}
-.adg-side.red{background:var(--red-bg);}
-.adg-side-title{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:3px;margin-bottom:2px;}
-.adg-side-title.blue{color:var(--blue);}
-.adg-side-title.red{color:var(--red);}
-.adg-section-lbl{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;color:rgba(212,168,67,0.7);margin-bottom:3px;}
-/* pick row: 5 slots */
-.adg-picks{display:flex;gap:5px;}
-.adg-slot{
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  cursor:pointer;width:52px;
-}
-.adg-slot-role{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:1px;color:rgba(212,168,67,0.65);text-align:center;}
-.adg-slot-img{
-  width:44px;height:44px;border:1px solid rgba(255,255,255,0.15);
-  overflow:hidden;position:relative;transition:border-color .15s;
-  background:rgba(200,155,60,0.04);
-}
-.adg-slot:hover .adg-slot-img{border-color:var(--gold-dim);}
-.adg-slot-img img{width:115%;height:115%;object-fit:cover;object-position:top center;margin:-7% 0 0 -7%;}
-.adg-slot-img.empty{border:1px dashed rgba(212,168,67,0.3);}
-.adg-slot-img .adg-clear{
-  position:absolute;inset:0;background:rgba(0,0,0,0.55);
-  display:none;align-items:center;justify-content:center;
-  font-size:14px;color:rgba(255,80,80,0.9);
-}
-.adg-slot:hover .adg-slot-img .adg-clear{display:flex;}
-.adg-slot-name{font-family:'Rajdhani',sans-serif;font-size:8px;font-weight:700;
-  color:rgba(210,210,228,0.85);text-align:center;max-width:52px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-/* bans row */
-.adg-bans{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
-.adg-ban-slot{
-  width:34px;height:34px;border:1px dashed rgba(212,168,67,0.3);
-  background:rgba(200,155,60,0.03);position:relative;
-  cursor:pointer;overflow:hidden;transition:border-color .15s;flex-shrink:0;
-}
-.adg-ban-slot:hover{border-color:rgba(255,80,80,0.4);}
-.adg-ban-slot img{width:115%;height:115%;object-fit:cover;object-position:top center;margin:-7% 0 0 -7%;
-  filter:grayscale(0.5) brightness(0.55) sepia(0.3);}
-.adg-ban-slot::after{content:'✕';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:900;color:rgba(220,40,50,0);transition:color .1s;}
-.adg-ban-slot.filled::after{color:rgba(220,40,50,0.85);}
-.adg-ban-slot:hover::after{color:rgba(255,80,80,0.9)!important;}
-.adg-add-ban{
-  width:34px;height:34px;border:1px dashed rgba(212,168,67,0.3);
-  background:rgba(200,155,60,0.02);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:rgba(212,168,67,0.5);font-size:16px;
-  transition:all .15s;flex-shrink:0;
-}
-.adg-add-ban:hover{border-color:var(--gold);color:var(--gold);}
-
-/* champ pick button */
-.champ-pick-btn{
-  cursor:pointer;display:flex;align-items:center;gap:8px;
-  background:var(--bg);border:1px solid var(--border);
-  padding:7px 10px;min-height:36px;transition:border-color .2s;
-}
-.champ-pick-btn:hover{border-color:var(--gold);}
-
-/* ── TOAST ── */
 #toast{position:fixed;bottom:20px;right:20px;z-index:9999;background:var(--surface2);
   border:1px solid var(--gold-dim);color:#F0E6BE;font-family:'Rajdhani',sans-serif;
   font-size:12px;letter-spacing:1px;padding:8px 16px;opacity:0;transform:translateY(8px);
@@ -437,968 +112,207 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
 </style>
 </head>
 <body>
-
-<!-- ══ LOGIN ══ -->
-<div id="view-login">
-  <div class="login-box">
-    <div class="login-title">FEARLESS DRAFT</div>
-    <div class="login-sub">ADMIN ACCESS</div>
-    <input class="li" type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">ENTER</button>
-    <div class="login-err hidden" id="login-err">Incorrect password</div>
-    <div class="disp-lnk" onclick="showDisplay()">View display →</div>
+<nav>
+  <div class="nav-logo">FEARLESS <span>SERIES</span></div>
+  <a class="nav-btn" href="admin.html">ADMIN</a>
+</nav>
+<div class="series-header">
+  <div class="team-hero t1" id="d-t1">TEAM 1</div>
+  <div class="score-block">
+    <div class="score-nums" id="d-score">0 — 0</div>
+    <div class="score-lbl">SERIES SCORE</div>
   </div>
+  <div class="team-hero t2" id="d-t2">TEAM 2</div>
 </div>
-
-<!-- ══ DISPLAY ══ -->
-<div id="view-display" class="hidden">
-  <nav>
-    <div class="nav-logo">FEARLESS <span>SERIES</span></div>
-    <button class="nav-btn" onclick="showLogin()">ADMIN</button>
-  </nav>
-  <div class="series-header">
-    <div class="team-hero t1" id="d-t1">TEAM 1</div>
-    <div class="score-block">
-      <div class="score-nums" id="d-score">0 — 0</div>
-      <div class="score-lbl">SERIES SCORE</div>
-    </div>
-    <div class="team-hero t2" id="d-t2">TEAM 2</div>
+<div class="games-stack" id="games-stack"></div>
+<div class="graveyard">
+  <div class="grave-hdr">
+    <div class="grave-title">FEARLESS GRAVEYARD</div>
+    <div class="grave-line"></div>
+    <div class="grave-count" id="grave-count">0 LOCKED</div>
   </div>
-  <div class="games-stack" id="games-stack"></div>
-  <div class="graveyard">
-    <div class="grave-hdr">
-      <div class="grave-title">FEARLESS GRAVEYARD</div>
-      <div class="grave-line"></div>
-      <div class="grave-count" id="grave-count">0 LOCKED</div>
-    </div>
-    <div id="grave-body"></div>
-  </div>
+  <div id="grave-body"></div>
 </div>
-
-<!-- ══ ADMIN ══ -->
-<div id="view-admin" class="hidden">
-  <nav>
-    <div class="nav-logo">FEARLESS <span>ADMIN</span></div>
-    <button class="nav-btn" onclick="showDisplay()">VIEW DISPLAY</button>
-  </nav>
-  <div style="padding:20px 16px 0">
-    <div class="admin-title">DRAFT CONTROL</div>
-    <div class="admin-sub">MANAGE SERIES · PICKS · BANS</div>
-
-    <!-- Series settings -->
-    <div class="asec">
-      <div class="asec-title">SERIES SETTINGS</div>
-      <div class="form-row">
-        <div class="fg"><div class="flabel">Team 1 Name</div><input class="fi" id="a-t1" placeholder="Team Alpha"></div>
-        <div class="fg"><div class="flabel">Team 2 Name</div><input class="fi" id="a-t2" placeholder="Team Omega"></div>
-        <div class="fg"><div class="flabel">Team 1 Score</div><input class="fi" id="a-s1" type="number" min="0" max="5" value="0"></div>
-        <div class="fg"><div class="flabel">Team 2 Score</div><input class="fi" id="a-s2" type="number" min="0" max="5" value="0"></div>
-        <div class="fg">
-          <div class="flabel">Best of</div>
-          <select class="fs" id="a-bestof">
-            <option value="1">BO1</option>
-            <option value="3">BO3</option>
-            <option value="5" selected>BO5</option>
-          </select>
-        </div>
-      </div>
-      <button class="abtn primary" onclick="saveSettings()">SAVE SETTINGS</button>
-    </div>
-
-    <!-- Blue side per game -->
-    <div class="asec">
-      <div class="asec-title">SIDE SELECTION</div>
-      <div id="per-game-sides"></div>
-    </div>
-
-    <!-- Post game results -->
-    <div class="asec">
-      <div class="asec-title">POST GAME — RESULTS</div>
-      <div id="per-game-winners"></div>
-    </div>
-
-    <!-- Per-game draft input -->
-    <div class="asec">
-      <div class="asec-title">DRAFT INPUT</div>
-      <div id="admin-draft-games"></div>
-    </div>
-
-    <!-- Danger -->
-    <div class="asec" style="display:flex;gap:12px;align-items:center;">
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:var(--gold-dim)">DANGER</span>
-      <button class="abtn danger" onclick="resetAll()">RESET ALL DATA</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ CHAMPION PICKER ══ -->
-<div id="picker-overlay" class="hidden" onclick="if(event.target===this)closePicker()">
-  <div class="picker-box">
-    <div class="picker-header">
-      <div class="picker-title" id="picker-title">SELECT CHAMPION</div>
-      <button class="picker-close" onclick="closePicker()">✕</button>
-    </div>
-    <div class="picker-search-wrap">
-      <input class="picker-search" id="picker-search" placeholder="Search champion…" oninput="filterPicker(this.value)" onkeydown="if(event.key==='Enter'){const v=document.querySelectorAll('#picker-grid .pchamp:not(.unavailable)');if(v.length===1)v[0].click();}" autocomplete="off">
-    </div>
-    <div class="picker-grid" id="picker-grid"></div>
-  </div>
-</div>
-
 <div id="toast"></div>
-
 <script>
-// ══════════════════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════════════════
-const PASS = '1';
-
-// Default state — team1/team2 are fixed names; each game tracks its own blue/red side
-function defaultState() {
-  return {
-    team1: 'TEAM 1',
-    team2: 'TEAM 2',
-    score1: 0,
-    score2: 0,
-    bestOf: 5,
-    // games[i]: { side1:'t1'|'t2', winner:'t1'|'t2'|'', picks:[], bans:[] }
-    // side1 = which team is on blue side this game
-    games: Array.from({length:5}, () => ({
-      side1: '', // TBD by default
-      winner: '',
-      picks: [], // {side:'t1'|'t2', champion, role}
-      bans:  []  // {side:'t1'|'t2', champion}
-    }))
-  };
-}
-
-let S = defaultState();
-
-// ══════════════════════════════════════════════════
-//  FIREBASE
-// ══════════════════════════════════════════════════
 const FB_URL = 'https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app/draft.json';
+let DD = '15.1.1';
+const CM = {}, CD_ID = {};
+let ALL_CHAMPS = [];
+let S = defaultState();
+const displayCollapsed = {};
 
+function defaultState() {
+  return { team1:'TEAM 1', team2:'TEAM 2', score1:0, score2:0, bestOf:5,
+    games: Array.from({length:5},()=>({side1:'',winner:'',picks:[],bans:[]})) };
+}
 function normaliseState(d) {
-  if (!d || typeof d !== 'object') return defaultState();
-  if (!d.games || !Array.isArray(d.games)) d.games = defaultState().games;
-  while (d.games.length < 5) d.games.push({side1:'',winner:'',picks:[],bans:[]});
-  d.games = d.games.map(g => ({
-    side1:   g.side1   ?? '',
-    winner:  g.winner  ?? '',
-    picks:   Array.isArray(g.picks) ? g.picks : [],
-    bans:    Array.isArray(g.bans)  ? g.bans  : []
-  }));
-  d.team1   = d.team1   ?? 'TEAM 1';
-  d.team2   = d.team2   ?? 'TEAM 2';
-  d.score1  = d.score1  ?? 0;
-  d.score2  = d.score2  ?? 0;
-  d.bestOf  = d.bestOf  ?? 5;
+  if (!d||typeof d!=='object') return defaultState();
+  if (!d.games||!Array.isArray(d.games)) d.games=defaultState().games;
+  while (d.games.length<5) d.games.push({side1:'',winner:'',picks:[],bans:[]});
+  d.games=d.games.map(g=>({side1:g.side1??'',winner:g.winner??'',picks:Array.isArray(g.picks)?g.picks:[],bans:Array.isArray(g.bans)?g.bans:[]}));
+  d.team1=d.team1??'TEAM 1'; d.team2=d.team2??'TEAM 2';
+  d.score1=d.score1??0; d.score2=d.score2??0; d.bestOf=d.bestOf??5;
   return d;
 }
 
-async function save() {
-  try {
-    const resp = await fetch(FB_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(S)
-    });
-    if (!resp.ok) console.warn('Firebase save error', resp.status);
-  } catch(e) { console.warn('Firebase save failed', e); }
+function cdnImg(id){return`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${id}.png`;}
+function cImgDD(name){const k=CM[name];return k?`https://ddragon.leagueoflegends.com/cdn/${DD}/img/champion/${k}.png`:`https://ddragon.leagueoflegends.com/cdn/${DD}/img/champion/${name.replace(/[^a-zA-Z0-9]/g,'')}.png`;}
+function cImg(name){const id=CD_ID[name];return id!==undefined?cdnImg(id):cImgDD(name);}
+function setImg(el,name){el.src=cImg(name);el.onerror=function(){const dd=cImgDD(name);if(this.src!==dd)this.src=dd;else{this.style.opacity=0.3;this.onerror=null;}};}
+
+async function loadChamps(){
+  try{
+    const v=await(await fetch('https://ddragon.leagueoflegends.com/api/versions.json')).json();
+    DD=v[0];
+    const d=await(await fetch(`https://ddragon.leagueoflegends.com/cdn/${DD}/data/en_US/champion.json`)).json();
+    Object.keys(d.data).forEach(k=>{CM[d.data[k].name]=k;CD_ID[d.data[k].name]=parseInt(d.data[k].key);});
+  }catch(e){}
 }
 
-async function load() {
-  try {
-    const r = await fetch(FB_URL);
-    if (r.ok) {
-      const d = await r.json();
-      S = normaliseState(d);
-    }
-  } catch(e) { console.warn('Firebase load failed', e); }
-}
+function gameSides(g){const tbd=!g.side1;const blue=g.side1||'t1';return{blueTeam:blue,redTeam:blue==='t1'?'t2':'t1',tbd};}
+function teamName(s){return s==='t1'?S.team1:S.team2;}
 
-// Poll every 3 seconds — always update display regardless of which view is active
-let pollInterval = null;
-function startLiveSync() {
-  if (pollInterval) clearInterval(pollInterval);
-  pollInterval = setInterval(async () => {
-    try {
-      const r = await fetch(FB_URL);
-      if (r.ok) {
-        const d = await r.json();
-        S = normaliseState(d);
-        // Only re-render display if display is visible
-        if (!document.getElementById('view-display').classList.contains('hidden')) {
-          renderDisplay();
-        }
-      }
-    } catch(e) {}
-  }, 3000);
-}
+const ROLE_ORDER=['Top','Jungle','Mid','Bot','Support'];
+const ROLE_SHORT={Top:'TOP',Jungle:'JGL',Mid:'MID',Bot:'BOT',Support:'SUP'};
 
-// Helper: given a game, which team is on "left" (t1 or t2) and which color is each team
-function gameSides(g) {
-  const tbd = !g.side1;
-  const blueTeam = g.side1 || 't1';
-  const redTeam  = blueTeam === 't1' ? 't2' : 't1';
-  return { blueTeam, redTeam, tbd };
-}
-
-function teamName(side) { return side === 't1' ? S.team1 : S.team2; }
-
-// ══════════════════════════════════════════════════
-//  DDRAGON / COMMUNITY DRAGON
-// ══════════════════════════════════════════════════
-let DD = '15.1.1';
-const CM = {};
-const CD_ID = {};
-let ALL_CHAMPS = [];
-
-function cdnImg(id) {
-  return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${id}.png`;
-}
-
-async function loadChamps() {
-  try {
-    const vr = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
-    const versions = await vr.json();
-    DD = versions[0];
-    const r = await fetch(`https://ddragon.leagueoflegends.com/cdn/${DD}/data/en_US/champion.json`);
-    const d = await r.json();
-    ALL_CHAMPS = Object.keys(d.data).map(k => {
-      const c = d.data[k];
-      return { name: c.name, key: k, id: parseInt(c.key) };
-    }).sort((a,b) => a.name.localeCompare(b.name));
-    ALL_CHAMPS.forEach(c => { CM[c.name] = c.key; CD_ID[c.name] = c.id; });
-  } catch(e) { console.warn('DDragon load failed', e); }
-}
-
-function cImg(name) {
-  const id = CD_ID[name];
-  if (id !== undefined) return cdnImg(id);
-  return cImgDDragon(name);
-}
-
-function cImgDDragon(name) {
-  const key = CM[name];
-  if (key) return `https://ddragon.leagueoflegends.com/cdn/${DD}/img/champion/${key}.png`;
-  return `https://ddragon.leagueoflegends.com/cdn/${DD}/img/champion/${name.replace(/[^a-zA-Z0-9]/g,'')}.png`;
-}
-
-function setImgWithFallback(imgEl, name) {
-  imgEl.src = cImg(name);
-  imgEl.onerror = function() {
-    // If CDragon failed, try DDragon
-    const dd = cImgDDragon(name);
-    if (this.src !== dd) { this.src = dd; }
-    else { this.style.opacity = 0.3; this.onerror = null; }
-  };
-}
-
-// ══════════════════════════════════════════════════
-//  VIEWS
-// ══════════════════════════════════════════════════
-function show(id) { document.getElementById(id).classList.remove('hidden'); }
-function hide(id) { document.getElementById(id).classList.add('hidden'); }
-function showLogin()   { hide('view-display'); hide('view-admin'); show('view-login'); setTimeout(()=>document.getElementById('pw-input').focus(),50); }
-function showDisplay() { hide('view-login');  hide('view-admin'); show('view-display'); renderDisplay(); startLiveSync(); }
-function showAdmin()   { hide('view-login');  hide('view-display'); show('view-admin'); populateAdmin(); }
-
-function doLogin() {
-  if (document.getElementById('pw-input').value === PASS) {
-    document.getElementById('login-err').classList.add('hidden');
-    document.getElementById('pw-input').value = '';
-    showAdmin();
-  } else {
-    document.getElementById('login-err').classList.remove('hidden');
-  }
-}
-
-// ══════════════════════════════════════════════════
-//  DISPLAY RENDER
-// ══════════════════════════════════════════════════
-function renderDisplay() {
-  document.getElementById('d-t1').textContent = S.team1;
-  document.getElementById('d-t2').textContent = S.team2;
-
-  // Compute score from game results
-  let s1 = 0, s2 = 0;
-  for (let i = 0; i < S.bestOf; i++) {
-    if (S.games[i].winner === 't1') s1++;
-    else if (S.games[i].winner === 't2') s2++;
-  }
-  document.getElementById('d-score').textContent = `${s1} — ${s2}`;
-
-  const stack = document.getElementById('games-stack');
-  stack.innerHTML = '';
-
-  // Only show bestOf games
-  for (let i = 0; i < S.bestOf; i++) {
-    stack.appendChild(buildGameBlock(S.games[i], i));
-  }
-
+function renderDisplay(){
+  document.getElementById('d-t1').textContent=S.team1;
+  document.getElementById('d-t2').textContent=S.team2;
+  let s1=0,s2=0;
+  for(let i=0;i<S.bestOf;i++){if(S.games[i].winner==='t1')s1++;else if(S.games[i].winner==='t2')s2++;}
+  document.getElementById('d-score').textContent=`${s1} — ${s2}`;
+  const stack=document.getElementById('games-stack');
+  stack.innerHTML='';
+  for(let i=0;i<S.bestOf;i++) stack.appendChild(buildGameBlock(S.games[i],i));
   renderGraveyard();
 }
 
-function buildGameBlock(g, gi) {
-  const { blueTeam, redTeam, tbd } = gameSides(g);
-  const blueName = tbd ? 'BLUE SIDE' : teamName(blueTeam);
-  const redName  = tbd ? 'RED SIDE'  : teamName(redTeam);
+function buildGameBlock(g,gi){
+  const {blueTeam,redTeam,tbd}=gameSides(g);
+  const blueName=tbd?'BLUE SIDE':teamName(blueTeam);
+  const redName=tbd?'RED SIDE':teamName(redTeam);
+  const bluePicks=g.picks.filter(p=>p.side===blueTeam);
+  const redPicks=g.picks.filter(p=>p.side===redTeam);
+  const blueBans=g.bans.filter(b=>b.side===blueTeam);
+  const redBans=g.bans.filter(b=>b.side===redTeam);
 
-  const bluePicks = g.picks.filter(p => p.side === blueTeam);
-  const redPicks  = g.picks.filter(p => p.side === redTeam);
-  const blueBans  = g.bans.filter(b => b.side === blueTeam);
-  const redBans   = g.bans.filter(b => b.side === redTeam);
+  const block=document.createElement('div'); block.className='game-block';
+  const hasContent=g.picks.length>0||g.bans.length>0;
+  if(displayCollapsed[gi]===undefined) displayCollapsed[gi]=!hasContent;
+  let collapsed=displayCollapsed[gi];
 
-  // Winner color class
-  const winClass = g.winner === blueTeam ? 'win-t1' : g.winner === redTeam ? 'win-t2' : '';
+  const lbl=document.createElement('div');
+  lbl.className='game-lbl'+(collapsed?' collapsed':'');
+  lbl.innerHTML=`<span>GAME ${gi+1}</span><span class="collapse-arrow">▾</span>`;
+  block.appendChild(lbl);
 
-  // Three-part header: [blue team] [GAME N] [red team]
-  const block = document.createElement('div');
-  block.className = 'game-block';
+  const body=document.createElement('div');
+  body.className='game-body'+(collapsed?' collapsed':'');
+  body.style.maxHeight=collapsed?'0px':'600px';
 
-  const hasContent = g.picks.length > 0 || g.bans.length > 0;
-  // Only set default the first time — preserve user's manual toggle after that
-  if (displayCollapsed[gi] === undefined) displayCollapsed[gi] = !hasContent;
-  let isCollapsed = displayCollapsed[gi];
+  // header
+  const hdr=document.createElement('div'); hdr.className='game-header';
+  const bh=document.createElement('div'); bh.className='game-header-team blue'; bh.textContent=blueName;
+  const mh=document.createElement('div'); mh.className='game-header-mid';
+  const rh=document.createElement('div'); rh.className='game-header-team red'; rh.textContent=redName;
+  hdr.appendChild(bh); hdr.appendChild(mh); hdr.appendChild(rh);
+  body.appendChild(hdr);
 
-  // "GAME N" label — clickable toggle
-  const gameLbl = document.createElement('div');
-  gameLbl.className = 'game-lbl' + (isCollapsed ? ' collapsed' : '');
-  const gameLblText = document.createElement('span');
-  gameLblText.textContent = `GAME ${gi+1}`;
-  const arrow = document.createElement('span');
-  arrow.className = 'collapse-arrow';
-  arrow.textContent = '▾';
-  gameLbl.appendChild(gameLblText);
-  gameLbl.appendChild(arrow);
-  block.appendChild(gameLbl);
-
-  // Collapsible body wrapping header + row + footer
-  const body = document.createElement('div');
-  body.className = 'game-body' + (isCollapsed ? ' collapsed' : '');
-
-  const header = document.createElement('div');
-  header.className = 'game-header';
-
-  const blueHdr = document.createElement('div');
-  blueHdr.className = 'game-header-team blue';
-  blueHdr.textContent = blueName;
-
-  const midHdr = document.createElement('div');
-  midHdr.className = 'game-header-mid';
-
-  const redHdr = document.createElement('div');
-  redHdr.className = 'game-header-team red';
-  redHdr.textContent = redName;
-
-  header.appendChild(blueHdr);
-  header.appendChild(midHdr);
-  header.appendChild(redHdr);
-  body.appendChild(header);
-
-  // Game row
-  const row = document.createElement('div');
-  row.className = 'game-row';
-
-  // Blue team column
-  const blueCol = document.createElement('div');
-  blueCol.className = 'team-col t1';
-
-  const bluePicksDiv = document.createElement('div');
-  bluePicksDiv.className = 'tc-picks';
-  buildRoleSlots(bluePicks, bluePicksDiv);
-  blueCol.appendChild(bluePicksDiv);
-
-  if (blueBans.length) {
-    const bansRow = document.createElement('div');
-    bansRow.className = 'tc-bans';
-    const lbl = document.createElement('span');
-    lbl.className = 'tc-bans-lbl';
-    lbl.textContent = 'BANS';
-    bansRow.appendChild(lbl);
-    blueBans.forEach(b => bansRow.appendChild(makeCI(b.champion, true, '', true)));
-    blueCol.appendChild(bansRow);
-  }
-
-  // Divider
-  const divider = document.createElement('div');
-  divider.className = 'game-divider';
-
-  // Red team column
-  const redCol = document.createElement('div');
-  redCol.className = 'team-col t2';
-
-  const redPicksDiv = document.createElement('div');
-  redPicksDiv.className = 'tc-picks';
-  buildRoleSlots(redPicks, redPicksDiv);
-  redCol.appendChild(redPicksDiv);
-
-  if (redBans.length) {
-    const bansRow = document.createElement('div');
-    bansRow.className = 'tc-bans';
-    const lbl = document.createElement('span');
-    lbl.className = 'tc-bans-lbl';
-    lbl.textContent = 'BANS';
-    bansRow.appendChild(lbl);
-    redBans.forEach(b => bansRow.appendChild(makeCI(b.champion, true, '', true)));
-    redCol.appendChild(bansRow);
-  }
-
-  row.appendChild(blueCol);
-  row.appendChild(divider);
-  row.appendChild(redCol);
+  // row
+  const row=document.createElement('div'); row.className='game-row';
+  const bc=document.createElement('div'); bc.className='team-col t1';
+  const bp=document.createElement('div'); bp.className='tc-picks';
+  buildRoleSlots(bluePicks,bp); bc.appendChild(bp);
+  if(blueBans.length){const br=document.createElement('div');br.className='tc-bans';const l=document.createElement('span');l.className='tc-bans-lbl';l.textContent='BANS';br.appendChild(l);blueBans.forEach(b=>br.appendChild(makeCI(b.champion,true,'',true)));bc.appendChild(br);}
+  const div=document.createElement('div'); div.className='game-divider';
+  const rc=document.createElement('div'); rc.className='team-col t2';
+  const rp=document.createElement('div'); rp.className='tc-picks';
+  buildRoleSlots(redPicks,rp); rc.appendChild(rp);
+  if(redBans.length){const br=document.createElement('div');br.className='tc-bans';const l=document.createElement('span');l.className='tc-bans-lbl';l.textContent='BANS';br.appendChild(l);redBans.forEach(b=>br.appendChild(makeCI(b.champion,true,'',true)));rc.appendChild(br);}
+  row.appendChild(bc); row.appendChild(div); row.appendChild(rc);
   body.appendChild(row);
 
-  // Winner footer (below the row)
-  const footer = document.createElement('div');
-  if (g.winner) {
-    footer.className = `game-footer ${g.winner === 't1' ? 'win-t1' : 'win-t2'}`;
-    footer.textContent = `▲ ${teamName(g.winner)} WINS`;
-  } else {
-    footer.className = 'game-footer tbd';
-    footer.textContent = 'NO RESULT';
-  }
+  // footer
+  const footer=document.createElement('div');
+  if(g.winner){footer.className='game-footer won';footer.textContent=`▲ ${teamName(g.winner)} WINS`;}
+  else{footer.className='game-footer tbd';footer.textContent='NO RESULT';}
   body.appendChild(footer);
-
-  // Set initial max-height so transition works
-  body.style.maxHeight = isCollapsed ? '0px' : '600px';
-
   block.appendChild(body);
 
-  // Toggle on click
-  gameLbl.addEventListener('click', () => {
-    isCollapsed = !isCollapsed;
-    displayCollapsed[gi] = isCollapsed;
-    if (isCollapsed) {
-      body.style.maxHeight = body.scrollHeight + 'px';
-      requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
-      body.classList.add('collapsed');
-      gameLbl.classList.add('collapsed');
-    } else {
-      body.classList.remove('collapsed');
-      gameLbl.classList.remove('collapsed');
-      body.style.maxHeight = '600px';
-    }
+  lbl.addEventListener('click',()=>{
+    collapsed=!collapsed; displayCollapsed[gi]=collapsed;
+    lbl.classList.toggle('collapsed',collapsed);
+    if(collapsed){body.style.maxHeight=body.scrollHeight+'px';requestAnimationFrame(()=>{body.style.maxHeight='0px';});body.classList.add('collapsed');}
+    else{body.classList.remove('collapsed');body.style.maxHeight='600px';}
   });
-
   return block;
 }
 
-// Build 5 role-ordered pick slots (always Top > Jungle > Mid > Bot > Support)
-const ROLE_ORDER = ['Top', 'Jungle', 'Mid', 'Bot', 'Support'];
-const ROLE_SHORT  = { Top:'TOP', Jungle:'JGL', Mid:'MID', Bot:'BOT', Support:'SUP' };
-
-function buildRoleSlots(picks, container) {
-  // Map role -> pick (first match wins; unassigned picks fill empty slots left to right at end)
-  const assigned = {};
-  const unassigned = [];
-  picks.forEach(p => {
-    const r = ROLE_ORDER.includes(p.role) ? p.role : null;
-    if (r && !assigned[r]) assigned[r] = p;
-    else unassigned.push(p);
-  });
-
-  // Fill empty role slots with unassigned picks in order
-  let ui = 0;
-  ROLE_ORDER.forEach(role => {
-    if (!assigned[role] && ui < unassigned.length) {
-      assigned[role] = unassigned[ui++];
-    }
-  });
-
-  ROLE_ORDER.forEach(role => {
-    const p = assigned[role];
-    const slot = document.createElement('div');
-    slot.className = 'pick-slot' + (p ? '' : ' pick-slot-empty');
-
-    // Name above
-    const nameLbl = document.createElement('div');
-    nameLbl.className = 'pick-slot-name';
-    nameLbl.textContent = p ? p.champion : '';
-    slot.appendChild(nameLbl);
-
-    // Icon
-    if (p) {
-      slot.appendChild(makeCI(p.champion, false, p.role));
-    } else {
-      const empty = document.createElement('div');
-      empty.className = 'ci pick-slot-empty';
-      const iw = document.createElement('div');
-      iw.className = 'ci-img-wrap';
-      iw.style.cssText = 'background:rgba(212,168,67,0.06);border:1px dashed rgba(212,168,67,0.25);width:44px;height:44px;';
-      empty.appendChild(iw);
-      slot.appendChild(empty);
-    }
-
-    // Role below
-    const roleLbl = document.createElement('div');
-    roleLbl.className = 'pick-slot-role';
-    roleLbl.textContent = ROLE_SHORT[role];
-    slot.appendChild(roleLbl);
-
+function buildRoleSlots(picks,container){
+  const assigned={},unassigned=[];
+  picks.forEach(p=>{const r=ROLE_ORDER.includes(p.role)?p.role:null;if(r&&!assigned[r])assigned[r]=p;else unassigned.push(p);});
+  let ui=0;
+  ROLE_ORDER.forEach(role=>{if(!assigned[role]&&ui<unassigned.length)assigned[role]=unassigned[ui++];});
+  ROLE_ORDER.forEach(role=>{
+    const p=assigned[role];
+    const slot=document.createElement('div'); slot.className='pick-slot'+(p?'':' pick-slot-empty');
+    const nm=document.createElement('div'); nm.className='pick-slot-name'; nm.textContent=p?p.champion:''; slot.appendChild(nm);
+    if(p){slot.appendChild(makeCI(p.champion,false,p.role));}
+    else{const e=document.createElement('div');e.className='ci pick-slot-empty';const iw=document.createElement('div');iw.className='ci-img-wrap';iw.style.cssText='background:rgba(212,168,67,0.06);border:1px dashed rgba(212,168,67,0.25);width:44px;height:44px;';e.appendChild(iw);slot.appendChild(e);}
+    const rl=document.createElement('div'); rl.className='pick-slot-role'; rl.textContent=ROLE_SHORT[role]; slot.appendChild(rl);
     container.appendChild(slot);
   });
 }
 
-// Build a champion icon element
-function makeCI(name, isBan, role='', small=false) {
-  const wrap = document.createElement('div');
-  wrap.className = 'ci' + (isBan ? ' ban' : '') + (small ? ' sm' : '');
-
-  const imgWrap = document.createElement('div');
-  imgWrap.className = 'ci-img-wrap';
-  if (small) { imgWrap.style.width='32px'; imgWrap.style.height='32px'; }
-
-  const img = document.createElement('img');
-  setImgWithFallback(img, name);
-  img.alt = name;
-  imgWrap.appendChild(img);
-  wrap.appendChild(imgWrap);
-
-  // X overlay for bans
-  if (isBan) {
-    const x = document.createElement('div');
-    x.className = 'ban-x';
-    x.textContent = '✕';
-    x.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:'+(small?'12px':'16px')+';font-weight:900;color:rgba(255,60,60,0.92);text-shadow:0 0 6px rgba(200,0,0,0.7);pointer-events:none;z-index:2;';
-    wrap.appendChild(x);
-  }
-
-  // Tooltip
-  const tip = document.createElement('div');
-  tip.className = 'ctip';
-  tip.textContent = name + (role ? ' · ' + role : '');
-  wrap.appendChild(tip);
-
+function makeCI(name,isBan,role='',small=false){
+  const wrap=document.createElement('div'); wrap.className='ci'+(isBan?' ban':'')+(small?' sm':'');
+  const iw=document.createElement('div'); iw.className='ci-img-wrap';
+  if(small){iw.style.width='32px';iw.style.height='32px';}
+  const img=document.createElement('img'); setImg(img,name); iw.appendChild(img); wrap.appendChild(iw);
+  if(isBan){const x=document.createElement('div');x.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:'+(small?'12px':'16px')+';font-weight:900;color:rgba(255,60,60,0.92);text-shadow:0 0 6px rgba(200,0,0,0.7);pointer-events:none;z-index:2;';x.textContent='✕';wrap.appendChild(x);}
+  const tip=document.createElement('div'); tip.className='ctip'; tip.textContent=name+(role?' · '+role:''); wrap.appendChild(tip);
   return wrap;
 }
 
-function renderGraveyard() {
-  const ROLES = ['Top', 'Jungle', 'Mid', 'Bot', 'Support', ''];
-  const ROLE_LABELS = { 'Top':'TOP', 'Jungle':'JUNGLE', 'Mid':'MID', 'Bot':'BOT', 'Support':'SUPPORT', '':'NO ROLE' };
-
-  const seen = new Set();
-  const byRole = {};
-  ROLES.forEach(r => byRole[r] = []);
-
-  for (let gi = 0; gi < S.bestOf; gi++) {
-    const g = S.games[gi];
-    g.picks.forEach(p => {
-      const k = p.champion.toLowerCase();
-      if (!seen.has(k)) {
-        seen.add(k);
-        const role = ROLES.includes(p.role) ? p.role : '';
-        byRole[role].push({...p, game: gi+1});
-      }
-    });
+function renderGraveyard(){
+  const ROLES=['Top','Jungle','Mid','Bot','Support',''];
+  const LABELS={Top:'TOP',Jungle:'JUNGLE',Mid:'MID',Bot:'BOT',Support:'SUPPORT','':'NO ROLE'};
+  const seen=new Set(),byRole={};
+  ROLES.forEach(r=>byRole[r]=[]);
+  for(let gi=0;gi<S.bestOf;gi++){
+    S.games[gi].picks.forEach(p=>{const k=p.champion.toLowerCase();if(!seen.has(k)){seen.add(k);const r=ROLES.includes(p.role)?p.role:'';byRole[r].push({...p,game:gi+1});}});
   }
-
-  const total = seen.size;
-  document.getElementById('grave-count').textContent = `${total} LOCKED`;
-
-  const container = document.getElementById('grave-body');
-  container.innerHTML = '';
-
-  if (total === 0) {
-    container.innerHTML = `<span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(200,155,60,0.18);letter-spacing:2px;">NONE YET</span>`;
-    return;
-  }
-
-  ROLES.forEach(role => {
-    const entries = byRole[role];
-    if (!entries.length) return;
-
-    const row = document.createElement('div');
-    row.className = 'grave-role-row';
-
-    const lbl = document.createElement('div');
-    lbl.className = 'grave-role-lbl';
-    lbl.textContent = ROLE_LABELS[role];
-    row.appendChild(lbl);
-
-    const chips = document.createElement('div');
-    chips.className = 'grave-chips';
-
-    entries.forEach(e => {
-      const chip = document.createElement('div');
-      chip.className = 'gchip';
-      const img = document.createElement('img');
-      setImgWithFallback(img, e.champion);
-      // tooltip on hover
-      const tip = document.createElement('div');
-      tip.className = 'gtip';
-      tip.textContent = e.champion + ' · G' + e.game;
-      chip.appendChild(img);
-      chip.appendChild(tip);
-      chips.appendChild(chip);
+  document.getElementById('grave-count').textContent=`${seen.size} LOCKED`;
+  const body=document.getElementById('grave-body'); body.innerHTML='';
+  if(!seen.size){body.innerHTML=`<span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(212,168,67,0.18);letter-spacing:2px;">NONE YET</span>`;return;}
+  ROLES.forEach(role=>{
+    const entries=byRole[role]; if(!entries.length)return;
+    const row=document.createElement('div'); row.className='grave-role-row';
+    const lbl=document.createElement('div'); lbl.className='grave-role-lbl'; lbl.textContent=LABELS[role]; row.appendChild(lbl);
+    const chips=document.createElement('div'); chips.className='grave-chips';
+    entries.forEach(e=>{
+      const chip=document.createElement('div'); chip.className='gchip';
+      const img=document.createElement('img'); setImg(img,e.champion);
+      const tip=document.createElement('div'); tip.className='gtip'; tip.textContent=e.champion+' · G'+e.game;
+      chip.appendChild(img); chip.appendChild(tip); chips.appendChild(chip);
     });
-
-    row.appendChild(chips);
-    container.appendChild(row);
+    row.appendChild(chips); body.appendChild(row);
   });
 }
 
-// ══════════════════════════════════════════════════
-//  CHAMPION PICKER
-// ══════════════════════════════════════════════════
-// pickerCtx: { gi, side, role, type } for picks/bans
-let pickerCtx = null;
+// Live poll every 3 seconds
+setInterval(async()=>{
+  try{
+    const r=await fetch(FB_URL);
+    if(r.ok){S=normaliseState(await r.json());renderDisplay();}
+  }catch(e){}
+},3000);
 
-function openPickerForSlot(gi, side, role) {
-  pickerCtx = { gi, side, role, type: 'pick' };
-  openPicker(`PICK — ${role.toUpperCase()} — ${teamName(side)}`);
-}
-function openPickerForBan(gi, side, banIdx) {
-  pickerCtx = { gi, side, banIdx, type: 'ban' };
-  openPicker(`BAN — ${teamName(side)}`);
-}
-
-function openPicker(title) {
-  document.getElementById('picker-title').textContent = title || 'SELECT CHAMPION';
-  document.getElementById('picker-search').value = '';
-  buildPickerGrid('');
-  show('picker-overlay');
-  setTimeout(() => document.getElementById('picker-search').focus(), 80);
-}
-function closePicker() { hide('picker-overlay'); }
-
-function buildPickerGrid(query) {
-  const gi = pickerCtx ? pickerCtx.gi : 0;
-  const usedInGame = new Set();
-  S.games[gi].picks.forEach(p => usedInGame.add(p.champion.toLowerCase()));
-  S.games[gi].bans.forEach(b => usedInGame.add(b.champion.toLowerCase()));
-
-  const q = query.trim().toLowerCase().replace(/'/g, '');
-  const filtered = q ? ALL_CHAMPS.filter(c => c.name.toLowerCase().replace(/'/g, '').includes(q)) : ALL_CHAMPS;
-  const grid = document.getElementById('picker-grid');
-  grid.innerHTML = '';
-
-  filtered.forEach(c => {
-    const used = usedInGame.has(c.name.toLowerCase());
-    const div = document.createElement('div');
-    div.className = 'pchamp' + (used ? ' unavailable' : '');
-    const img = document.createElement('img');
-    setImgWithFallback(img, c.name); img.alt = c.name; img.loading = 'lazy';
-    const lbl = document.createElement('div');
-    lbl.className = 'pchamp-name';
-    lbl.textContent = c.name;
-    div.appendChild(img); div.appendChild(lbl);
-    if (!used) div.addEventListener('click', () => selectChamp(c.name));
-    grid.appendChild(div);
-  });
-}
-
-function filterPicker(q) { buildPickerGrid(q); }
-
-function selectChamp(name) {
-  if (!pickerCtx) { closePicker(); return; }
-  const { gi, side, type, role, banIdx } = pickerCtx;
-  const g = S.games[gi];
-
-  if (type === 'pick') {
-    const existing = g.picks.findIndex(p => p.side === side && p.role === role);
-    if (existing >= 0) g.picks[existing].champion = name;
-    else g.picks.push({ side, champion: name, role });
-  } else {
-    const sideBans = g.bans.filter(b => b.side === side);
-    if (banIdx < sideBans.length) {
-      let count = 0;
-      for (let i = 0; i < g.bans.length; i++) {
-        if (g.bans[i].side === side) {
-          if (count === banIdx) { g.bans[i].champion = name; break; }
-          count++;
-        }
-      }
-    } else {
-      g.bans.push({ side, champion: name });
-    }
-  }
-
-  pickerCtx = null;
-  save();
-  renderAdminDraftGames();
-  closePicker();
-  toast('Set ' + name);
-}
-
-// ══════════════════════════════════════════════════
-//  ADMIN
-// ══════════════════════════════════════════════════
-const adminCollapsed = {};
-const displayCollapsed = {};
-
-function populateAdmin() {
-  document.getElementById('a-t1').value = S.team1;
-  document.getElementById('a-t2').value = S.team2;
-  document.getElementById('a-s1').value = S.score1;
-  document.getElementById('a-s2').value = S.score2;
-  document.getElementById('a-bestof').value = String(S.bestOf);
-  renderPerGameSettings();
-  renderAdminDraftGames();
-}
-
-function renderPerGameSettings() {
-  renderSideSelection();
-  renderPostGame();
-}
-
-function renderSideSelection() {
-  const container = document.getElementById('per-game-sides');
-  container.innerHTML = '';
-  const grid = document.createElement('div');
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;';
-  for (let i = 0; i < S.bestOf; i++) {
-    const g = S.games[i];
-    const cell = document.createElement('div');
-    cell.style.cssText = 'background:var(--surface2);border:1px solid var(--border);padding:10px;display:flex;flex-direction:column;gap:6px;';
-    const title = document.createElement('div');
-    title.style.cssText = "font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:var(--gold);border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:2px;";
-    title.textContent = 'GAME ' + (i+1);
-    cell.appendChild(title);
-    const blueLabel = document.createElement('div');
-    blueLabel.className = 'flabel'; blueLabel.textContent = 'Blue Side';
-    const blueSel = document.createElement('select');
-    blueSel.className = 'fs'; blueSel.style.fontSize = '12px';
-    [['', 'TBD'], ['t1', teamName('t1')], ['t2', teamName('t2')]].forEach(([v, label]) => {
-      const o = document.createElement('option');
-      o.value = v; o.textContent = label;
-      if (g.side1 === v) o.selected = true;
-      blueSel.appendChild(o);
-    });
-    const idx = i;
-    blueSel.addEventListener('change', () => { S.games[idx].side1 = blueSel.value; save(); toast('Game ' + (idx+1) + ' sides updated'); renderAdminDraftGames(); });
-    cell.appendChild(blueLabel); cell.appendChild(blueSel);
-    grid.appendChild(cell);
-  }
-  container.appendChild(grid);
-}
-
-function renderPostGame() {
-  const container = document.getElementById('per-game-winners');
-  container.innerHTML = '';
-  const grid = document.createElement('div');
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;';
-  for (let i = 0; i < S.bestOf; i++) {
-    const g = S.games[i];
-    const borderCol = g.winner==='t1' ? 'rgba(91,184,232,0.4)' : g.winner==='t2' ? 'rgba(232,91,91,0.4)' : 'var(--border)';
-    const cell = document.createElement('div');
-    cell.style.cssText = 'background:var(--surface2);border:1px solid ' + borderCol + ';padding:10px;display:flex;flex-direction:column;gap:6px;transition:border-color .2s;';
-    const title = document.createElement('div');
-    title.style.cssText = "font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:var(--gold);border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:2px;display:flex;align-items:center;justify-content:space-between;";
-    const titleText = document.createElement('span'); titleText.textContent = 'GAME ' + (i+1);
-    title.appendChild(titleText);
-    if (g.winner) {
-      const cur = document.createElement('span');
-      cur.style.cssText = 'font-size:9px;letter-spacing:1px;color:' + (g.winner==='t1'?'var(--blue)':'var(--red)') + ';';
-      cur.textContent = '▲ ' + teamName(g.winner);
-      title.appendChild(cur);
-    }
-    cell.appendChild(title);
-    const btnRow = document.createElement('div');
-    btnRow.style.cssText = 'display:grid;grid-template-columns:1fr auto 1fr;gap:4px;';
-    const t1btn = document.createElement('button');
-    t1btn.style.cssText = "font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;padding:6px 4px;border:1px solid;cursor:pointer;transition:all .15s;background:" + (g.winner==='t1'?'rgba(91,184,232,0.22)':'transparent') + ";border-color:" + (g.winner==='t1'?'var(--blue-border)':'rgba(91,184,232,0.2)') + ";color:" + (g.winner==='t1'?'var(--blue)':'rgba(91,184,232,0.5)') + ";";
-    t1btn.textContent = S.team1;
-    const resetBtn = document.createElement('button');
-    resetBtn.style.cssText = "font-family:'Share Tech Mono',monospace;font-size:9px;padding:6px;border:1px solid var(--border);cursor:pointer;background:transparent;color:var(--dim);";
-    resetBtn.textContent = '✕';
-    const t2btn = document.createElement('button');
-    t2btn.style.cssText = "font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;padding:6px 4px;border:1px solid;cursor:pointer;transition:all .15s;background:" + (g.winner==='t2'?'rgba(232,91,91,0.22)':'transparent') + ";border-color:" + (g.winner==='t2'?'var(--red-border)':'rgba(232,91,91,0.2)') + ";color:" + (g.winner==='t2'?'var(--red)':'rgba(232,91,91,0.5)') + ";";
-    t2btn.textContent = S.team2;
-    const idx = i;
-    t1btn.addEventListener('click', () => { S.games[idx].winner='t1'; save(); renderPostGame(); toast(S.team1 + ' wins G' + (idx+1)); });
-    resetBtn.addEventListener('click', () => { S.games[idx].winner=''; save(); renderPostGame(); toast('G' + (idx+1) + ' cleared'); });
-    t2btn.addEventListener('click', () => { S.games[idx].winner='t2'; save(); renderPostGame(); toast(S.team2 + ' wins G' + (idx+1)); });
-    btnRow.appendChild(t1btn); btnRow.appendChild(resetBtn); btnRow.appendChild(t2btn);
-    cell.appendChild(btnRow);
-    grid.appendChild(cell);
-  }
-  container.appendChild(grid);
-}
-
-function renderAdminDraftGames() {
-  const container = document.getElementById('admin-draft-games');
-  container.innerHTML = '';
-  for (let gi = 0; gi < S.bestOf; gi++) {
-    const g = S.games[gi];
-    const { blueTeam, redTeam } = gameSides(g);
-    const totalEntries = g.picks.length + g.bans.length;
-    if (adminCollapsed[gi] === undefined) adminCollapsed[gi] = totalEntries === 0;
-    const collapsed = adminCollapsed[gi];
-    const gameDiv = document.createElement('div');
-    gameDiv.className = 'adg-game';
-    // Header
-    const hdr = document.createElement('div');
-    hdr.className = 'adg-header';
-    const hdrLeft = document.createElement('div');
-    hdrLeft.className = 'adg-header-left';
-    const hdrTitle = document.createElement('div');
-    hdrTitle.className = 'adg-title';
-    hdrTitle.textContent = 'GAME ' + (gi+1);
-    const hdrSummary = document.createElement('div');
-    hdrSummary.className = 'adg-summary';
-    hdrSummary.textContent = totalEntries > 0 ? (g.picks.length + ' picks · ' + g.bans.length + ' bans') : 'empty';
-    hdrLeft.appendChild(hdrTitle); hdrLeft.appendChild(hdrSummary);
-    const arrow = document.createElement('span');
-    arrow.className = 'adg-arrow' + (collapsed ? ' collapsed' : '');
-    arrow.textContent = '▾';
-    hdr.appendChild(hdrLeft); hdr.appendChild(arrow);
-    // Body
-    const body = document.createElement('div');
-    body.className = 'adg-body' + (collapsed ? ' collapsed' : '');
-    body.style.maxHeight = collapsed ? '0px' : '1000px';
-    // Sides
-    const sides = document.createElement('div');
-    sides.className = 'adg-sides';
-    sides.appendChild(buildAdminSide(gi, blueTeam, 'blue'));
-    const divEl = document.createElement('div'); divEl.className = 'adg-divider';
-    sides.appendChild(divEl);
-    sides.appendChild(buildAdminSide(gi, redTeam, 'red'));
-    body.appendChild(sides);
-    // Toggle
-    let isCollapsed = collapsed;
-    hdr.addEventListener('click', () => {
-      isCollapsed = !isCollapsed;
-      adminCollapsed[gi] = isCollapsed;
-      arrow.className = 'adg-arrow' + (isCollapsed ? ' collapsed' : '');
-      body.style.maxHeight = isCollapsed ? '0px' : '1000px';
-      if (isCollapsed) body.classList.add('collapsed');
-      else body.classList.remove('collapsed');
-    });
-    gameDiv.appendChild(hdr);
-    gameDiv.appendChild(body);
-    container.appendChild(gameDiv);
-  }
-}
-
-function buildAdminSide(gi, side, colorClass) {
-  const g = S.games[gi];
-  const picks = g.picks.filter(p => p.side === side);
-  const bans  = g.bans.filter(b => b.side === side);
-  const col = document.createElement('div');
-  col.className = 'adg-side ' + colorClass;
-  const title = document.createElement('div');
-  title.className = 'adg-side-title ' + colorClass;
-  title.textContent = teamName(side);
-  col.appendChild(title);
-  // Picks
-  const picksLbl = document.createElement('div');
-  picksLbl.className = 'adg-section-lbl'; picksLbl.textContent = 'PICKS';
-  col.appendChild(picksLbl);
-  const picksRow = document.createElement('div');
-  picksRow.className = 'adg-picks';
-  ROLE_ORDER.forEach(role => {
-    const existing = picks.find(p => p.role === role);
-    const slot = document.createElement('div');
-    slot.className = 'adg-slot';
-    const roleLbl = document.createElement('div');
-    roleLbl.className = 'adg-slot-role';
-    roleLbl.textContent = ROLE_SHORT[role];
-    slot.appendChild(roleLbl);
-    const imgBox = document.createElement('div');
-    imgBox.className = 'adg-slot-img' + (existing ? '' : ' empty');
-    if (existing) {
-      const img = document.createElement('img');
-      setImgWithFallback(img, existing.champion);
-      imgBox.appendChild(img);
-      // Clear button — click to remove
-      const clearDiv = document.createElement('div');
-      clearDiv.className = 'adg-clear'; clearDiv.textContent = '✕';
-      clearDiv.addEventListener('click', e => {
-        e.stopPropagation();
-        const idx = g.picks.findIndex(p => p.side === side && p.role === role);
-        if (idx >= 0) { g.picks.splice(idx, 1); save(); renderAdminDraftGames(); }
-      });
-      imgBox.appendChild(clearDiv);
-    }
-    imgBox.addEventListener('click', () => openPickerForSlot(gi, side, role));
-    const nameLbl = document.createElement('div');
-    nameLbl.className = 'adg-slot-name';
-    nameLbl.textContent = existing ? existing.champion : '';
-    slot.appendChild(imgBox); slot.appendChild(nameLbl);
-    picksRow.appendChild(slot);
-  });
-  col.appendChild(picksRow);
-  // Bans
-  const bansLbl = document.createElement('div');
-  bansLbl.className = 'adg-section-lbl'; bansLbl.textContent = 'BANS';
-  col.appendChild(bansLbl);
-  const bansRow = document.createElement('div');
-  bansRow.className = 'adg-bans';
-  bans.forEach((b, bi) => {
-    const slot = document.createElement('div');
-    slot.className = 'adg-ban-slot filled';
-    slot.style.cssText = 'position:relative;overflow:hidden;';
-    const img = document.createElement('img');
-    setImgWithFallback(img, b.champion);
-    slot.appendChild(img);
-    slot.title = b.champion;
-    // Clear button
-    const clearDiv = document.createElement('div');
-    clearDiv.className = 'adg-clear';
-    clearDiv.textContent = '✕';
-    clearDiv.style.cssText = 'position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);font-size:12px;font-weight:900;color:rgba(255,80,80,0.95);cursor:pointer;z-index:2;';
-    clearDiv.addEventListener('click', e => {
-      e.stopPropagation();
-      let count = 0;
-      for (let i = 0; i < g.bans.length; i++) {
-        if (g.bans[i].side === side) {
-          if (count === bi) { g.bans.splice(i, 1); save(); renderAdminDraftGames(); return; }
-          count++;
-        }
-      }
-    });
-    slot.appendChild(clearDiv);
-    slot.addEventListener('mouseenter', () => clearDiv.style.display = 'flex');
-    slot.addEventListener('mouseleave', () => clearDiv.style.display = 'none');
-    // Click image area (not clear) to re-pick
-    img.addEventListener('click', () => openPickerForBan(gi, side, bi));
-    bansRow.appendChild(slot);
-  });
-  if (bans.length < 5) {
-    const addBtn = document.createElement('div');
-    addBtn.className = 'adg-add-ban'; addBtn.textContent = '+'; addBtn.title = 'Add ban';
-    addBtn.addEventListener('click', () => openPickerForBan(gi, side, bans.length));
-    bansRow.appendChild(addBtn);
-  }
-  col.appendChild(bansRow);
-  return col;
-}
-
-function saveSettings() {
-  S.team1  = document.getElementById('a-t1').value.trim() || 'TEAM 1';
-  S.team2  = document.getElementById('a-t2').value.trim() || 'TEAM 2';
-  S.score1 = parseInt(document.getElementById('a-s1').value) || 0;
-  S.score2 = parseInt(document.getElementById('a-s2').value) || 0;
-  S.bestOf = parseInt(document.getElementById('a-bestof').value) || 5;
-  save(); populateAdmin(); toast('Settings saved');
-}
-
-function resetAll() {
-  if (!confirm('Reset all draft data?')) return;
-  S = defaultState();
-  for (const k in adminCollapsed) delete adminCollapsed[k];
-  save(); populateAdmin(); toast('Reset complete');
-}
-// ══════════════════════════════════════════════════
-//  TOAST + INIT
-// ══════════════════════════════════════════════════
-let toastT;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2000);
-}
-
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closePicker(); });
-
-async function init() {
-  await load();
+async function init(){
+  renderDisplay();
   loadChamps();
-  showDisplay();
-  startLiveSync();
+  try{const r=await fetch(FB_URL);if(r.ok){S=normaliseState(await r.json());renderDisplay();}}catch(e){}
 }
 init();
 </script>
