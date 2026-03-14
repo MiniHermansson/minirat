@@ -516,23 +516,32 @@ async function sendChat(){
 }
 
 // ── ADMIN LIVE SYNC ──
+let _adminUnsub = null;
+
 function startAdminPoll(){
   stopAdminPoll();
-  adminPollInterval=setInterval(async()=>{
-    // Don't sync while picker is open
-    if(!document.getElementById('picker-overlay').classList.contains('hidden')) return;
-    // Don't sync for 5 seconds after a local save — our own save hasn't landed yet
-    if(Date.now() - lastSavedAt < 5000) return;
-    try{
-      const r=await fetch(FB_URL);
-      if(r.ok){
-        const newS=normaliseState(await r.json());
-        if(JSON.stringify(newS)!==JSON.stringify(S)){S=newS;populateAdmin();toast('Updated by another admin');}
+  waitFB(()=>{
+    let firstCall = true; // skip the immediate initial fire — we already loaded on sign-in
+    _adminUnsub = window._onValue(window._ref(window._db,'draft'), snap => {
+      if(firstCall){ firstCall=false; return; }
+      // Skip if this is echoing our own recent save
+      if(Date.now() - lastSavedAt < 8000) return;
+      // Skip if picker is open
+      if(!document.getElementById('picker-overlay').classList.contains('hidden')) return;
+      const remote = normaliseState(snap.val());
+      if(JSON.stringify(remote) !== JSON.stringify(S)){
+        S = remote;
+        populateAdmin();
+        toast('Updated by another admin');
       }
-    }catch(e){}
-  },8000);
+    });
+  });
 }
-function stopAdminPoll(){if(adminPollInterval){clearInterval(adminPollInterval);adminPollInterval=null;}}
+
+function stopAdminPoll(){
+  if(_adminUnsub){ _adminUnsub(); _adminUnsub=null; }
+  if(adminPollInterval){ clearInterval(adminPollInterval); adminPollInterval=null; }
+}
 
 // ── ADMIN RENDER ──
 function populateAdmin(){
