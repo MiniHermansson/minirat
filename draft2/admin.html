@@ -356,7 +356,10 @@ async function loadChamps(){
 }
 
 // ── FIREBASE DATA ──
+let lastSavedAt = 0;
+
 async function save(){
+  lastSavedAt = Date.now();
   try{
     const r=await fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(S)});
     if(!r.ok)console.warn('save error',r.status);
@@ -516,8 +519,10 @@ async function sendChat(){
 function startAdminPoll(){
   stopAdminPoll();
   adminPollInterval=setInterval(async()=>{
-    // Don't sync while the picker is open — would discard in-progress selection
+    // Don't sync while picker is open
     if(!document.getElementById('picker-overlay').classList.contains('hidden')) return;
+    // Don't sync for 5 seconds after a local save — our own save hasn't landed yet
+    if(Date.now() - lastSavedAt < 5000) return;
     try{
       const r=await fetch(FB_URL);
       if(r.ok){
