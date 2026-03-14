@@ -579,13 +579,32 @@ let S = defaultState();
 // ══════════════════════════════════════════════════
 const FB_URL = 'https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app/draft.json';
 
+function normaliseState(d) {
+  if (!d || typeof d !== 'object') return defaultState();
+  if (!d.games || !Array.isArray(d.games)) d.games = defaultState().games;
+  while (d.games.length < 5) d.games.push({side1:'',winner:'',picks:[],bans:[]});
+  d.games = d.games.map(g => ({
+    side1:   g.side1   ?? '',
+    winner:  g.winner  ?? '',
+    picks:   Array.isArray(g.picks) ? g.picks : [],
+    bans:    Array.isArray(g.bans)  ? g.bans  : []
+  }));
+  d.team1   = d.team1   ?? 'TEAM 1';
+  d.team2   = d.team2   ?? 'TEAM 2';
+  d.score1  = d.score1  ?? 0;
+  d.score2  = d.score2  ?? 0;
+  d.bestOf  = d.bestOf  ?? 5;
+  return d;
+}
+
 async function save() {
   try {
-    await fetch(FB_URL, {
+    const resp = await fetch(FB_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(S)
     });
+    if (!resp.ok) console.warn('Firebase save error', resp.status);
   } catch(e) { console.warn('Firebase save failed', e); }
 }
 
@@ -594,29 +613,23 @@ async function load() {
     const r = await fetch(FB_URL);
     if (r.ok) {
       const d = await r.json();
-      if (d) {
-        S = d;
-        while (S.games.length < 5) S.games.push({side1:'',winner:'',picks:[],bans:[]});
-        if (!S.bestOf) S.bestOf = 5;
-      }
+      S = normaliseState(d);
     }
   } catch(e) { console.warn('Firebase load failed', e); }
 }
 
-// Poll every 3 seconds on the display page so viewers see live updates
+// Poll every 3 seconds — always update display regardless of which view is active
 let pollInterval = null;
 function startLiveSync() {
-  if (pollInterval) return;
+  if (pollInterval) clearInterval(pollInterval);
   pollInterval = setInterval(async () => {
-    if (document.getElementById('view-display').classList.contains('hidden')) return;
     try {
       const r = await fetch(FB_URL);
       if (r.ok) {
         const d = await r.json();
-        if (d) {
-          S = d;
-          while (S.games.length < 5) S.games.push({side1:'',winner:'',picks:[],bans:[]});
-          if (!S.bestOf) S.bestOf = 5;
+        S = normaliseState(d);
+        // Only re-render display if display is visible
+        if (!document.getElementById('view-display').classList.contains('hidden')) {
           renderDisplay();
         }
       }
@@ -746,7 +759,9 @@ function buildGameBlock(g, gi) {
   block.className = 'game-block';
 
   const hasContent = g.picks.length > 0 || g.bans.length > 0;
-  let isCollapsed = !hasContent;
+  // Only set default the first time — preserve user's manual toggle after that
+  if (displayCollapsed[gi] === undefined) displayCollapsed[gi] = !hasContent;
+  let isCollapsed = displayCollapsed[gi];
 
   // "GAME N" label — clickable toggle
   const gameLbl = document.createElement('div');
@@ -855,8 +870,9 @@ function buildGameBlock(g, gi) {
   // Toggle on click
   gameLbl.addEventListener('click', () => {
     isCollapsed = !isCollapsed;
+    displayCollapsed[gi] = isCollapsed;
     if (isCollapsed) {
-      body.style.maxHeight = body.scrollHeight + 'px'; // set explicit before collapsing
+      body.style.maxHeight = body.scrollHeight + 'px';
       requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
       body.classList.add('collapsed');
       gameLbl.classList.add('collapsed');
@@ -1111,6 +1127,7 @@ function selectChamp(name) {
 //  ADMIN
 // ══════════════════════════════════════════════════
 const adminCollapsed = {};
+const displayCollapsed = {};
 
 function populateAdmin() {
   document.getElementById('a-t1').value = S.team1;
