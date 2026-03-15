@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fearless Draft — Users</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script type="module">
+  import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import{getAuth,signInWithEmailAndPassword,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import{getDatabase,ref,set,onValue,remove}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  const cfg={apiKey:"AIzaSyCHx89HHT-nHlP7kcNCTT21-2S7jvI9G-c",authDomain:"miniratxyz.firebaseapp.com",
+    databaseURL:"https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:"miniratxyz",storageBucket:"miniratxyz.firebasestorage.app",
+    messagingSenderId:"524360710142",appId:"1:524360710142:web:a99846767a02914a35b2af"};
+  const app=initializeApp(cfg);
+  window._auth=getAuth(app); window._db=getDatabase(app);
+  window._ref=ref; window._set=set; window._onValue=onValue; window._remove=remove;
+  window._signIn=signInWithEmailAndPassword; window._signOut=signOut;
+  window._fbReady=true; document.dispatchEvent(new Event('fb-ready'));
+</script>
+<style>
+:root{
+  --gold:#D4A843; --gold-dim:rgba(212,168,67,0.55); --gold-bg:rgba(212,168,67,0.12);
+  --red:#F55555; --red-bg:rgba(245,85,85,0.12); --red-border:rgba(245,85,85,0.5);
+  --bg:#07070D; --surface:#131320; --surface2:#1A1A2A;
+  --border:rgba(212,168,67,0.25); --text:#D0D0E0; --dim:rgba(208,208,224,0.55);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 70% 30% at 50% 0%,rgba(212,168,67,0.08) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 80% at 0% 50%,rgba(77,196,245,0.06) 0%,transparent 55%),
+    radial-gradient(ellipse 30% 80% at 100% 50%,rgba(245,85,85,0.06) 0%,transparent 55%);}
+.hidden{display:none!important;}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24px;
+  border-bottom:1px solid var(--border);background:rgba(7,7,13,0.97);backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:200;}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:var(--gold);}
+.nav-logo span{color:rgba(208,208,224,0.7);font-size:11px;letter-spacing:2px;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-btn{background:none;border:1px solid var(--border);color:var(--text);font-family:'Rajdhani',sans-serif;
+  font-size:12px;letter-spacing:1.5px;padding:5px 16px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.nav-btn:hover{border-color:var(--gold);color:var(--gold);}
+.nav-btn.danger{border-color:rgba(200,0,0,0.35);color:#cc3344;}
+.nav-btn.danger:hover{border-color:#cc3344;background:rgba(200,0,0,0.1);}
+
+.wrap{max-width:680px;margin:0 auto;padding:24px 16px 80px;position:relative;z-index:1;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:var(--gold);}
+.page-sub{font-size:11px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:24px;}
+.asec{background:var(--surface);border:1px solid var(--border);padding:16px;margin-bottom:14px;}
+.asec-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--gold);
+  padding-bottom:9px;margin-bottom:12px;border-bottom:1px solid var(--border);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px;}
+.fg{display:flex;flex-direction:column;gap:3px;}
+.flabel{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;}
+.fi{background:var(--bg);border:1px solid var(--border);color:var(--text);
+  font-family:'Rajdhani',sans-serif;font-size:13px;padding:7px 9px;outline:none;transition:border-color .2s;}
+.fi:focus{border-color:var(--gold);}
+.abtn{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;padding:7px 18px;cursor:pointer;border:1px solid;transition:all .2s;}
+.abtn.primary{background:rgba(212,168,67,0.12);border-color:var(--gold);color:var(--gold);}
+.abtn.primary:hover{background:rgba(212,168,67,0.24);}
+.abtn.danger{background:rgba(200,0,0,0.07);border-color:rgba(200,0,0,0.38);color:#cc3344;font-size:11px;padding:5px 14px;}
+.abtn.danger:hover{background:rgba(200,0,0,0.17);}
+
+.user-row{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;
+  border-bottom:1px solid var(--border);transition:background .15s;}
+.user-row:last-child{border-bottom:none;}
+.user-row:hover{background:var(--gold-bg);}
+.user-info{display:flex;flex-direction:column;gap:3px;}
+.user-name{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:var(--gold);display:flex;align-items:center;gap:8px;}
+.user-tag{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;
+  padding:2px 6px;border:1px solid;vertical-align:middle;}
+.user-tag.you{color:var(--gold-dim);border-color:rgba(212,168,67,0.3);}
+.user-email{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px;}
+.user-empty{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);
+  letter-spacing:1px;padding:18px 0;text-align:center;}
+
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;position:relative;z-index:1;}
+.login-box{background:var(--surface);border:1px solid var(--border);padding:36px 44px;text-align:center;min-width:320px;}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:var(--gold);margin-bottom:4px;}
+.login-sub{font-size:11px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:22px;}
+.li{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);
+  font-family:'Rajdhani',sans-serif;font-size:14px;padding:8px 10px;outline:none;margin-bottom:10px;display:block;}
+.li:focus{border-color:var(--gold);}
+.login-btn{width:100%;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:3px;padding:9px;
+  cursor:pointer;background:rgba(212,168,67,0.12);border:1px solid var(--gold);color:var(--gold);transition:all .2s;}
+.login-btn:hover{background:rgba(212,168,67,0.25);}
+.login-err{color:#cc3344;font-size:11px;margin-top:8px;letter-spacing:1px;min-height:16px;}
+.login-back{margin-top:14px;font-size:12px;color:var(--dim);letter-spacing:1px;text-decoration:underline;
+  text-underline-offset:3px;cursor:pointer;}
+.login-back:hover{color:var(--gold);}
+
+#toast{position:fixed;bottom:20px;left:20px;z-index:9999;background:var(--surface2);
+  border:1px solid var(--gold-dim);color:#F0E6BE;font-family:'Rajdhani',sans-serif;
+  font-size:12px;letter-spacing:1px;padding:8px 16px;opacity:0;transform:translateY(8px);
+  transition:all .2s;pointer-events:none;}
+#toast.show{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-title">USER MANAGEMENT</div>
+    <div class="login-sub">OWNER ACCESS ONLY</div>
+    <input class="li" type="password" id="l-pw" placeholder="Your password"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">SIGN IN</button>
+    <div class="login-err" id="l-err"></div>
+    <div class="login-back" onclick="window.location.href='admin.html'">← Back to admin</div>
+  </div>
+</div>
+
+<div id="panel" class="hidden">
+  <nav>
+    <div class="nav-logo">FEARLESS <span>USERS</span></div>
+    <div class="nav-right">
+      <a class="nav-btn" href="admin.html">ADMIN PANEL</a>
+      <button class="nav-btn danger" onclick="doSignOut()">SIGN OUT</button>
+    </div>
+  </nav>
+  <div class="wrap">
+    <div class="page-title">USER MANAGEMENT</div>
+    <div class="page-sub">ADD · REMOVE · MANAGE ADMIN ACCESS</div>
+
+    <div class="asec">
+      <div class="asec-title">ADD USER</div>
+      <div class="form-row">
+        <div class="fg">
+          <div class="flabel">Email</div>
+          <input class="fi" id="u-email" type="email" placeholder="user@example.com">
+        </div>
+        <div class="fg">
+          <div class="flabel">Temporary Password</div>
+          <input class="fi" id="u-pw" type="text" placeholder="min 6 characters">
+        </div>
+      </div>
+      <button class="abtn primary" onclick="addUser()">ADD USER</button>
+    </div>
+
+    <div class="asec">
+      <div class="asec-title">ACTIVE USERS</div>
+      <div id="user-list"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+// Set this to the email address of the owner account (you).
+// Only this account can access this page.
+const OWNER_EMAIL = 'jesperhermansson94@gmail.com';
+const API_KEY = 'AIzaSyCHx89HHT-nHlP7kcNCTT21-2S7jvI9G-c';
+// ────────────────────────────────────────────────────────────────────────────
+
+let currentUser = null;
+
+function waitFB(cb){if(window._fbReady){cb();return;}document.addEventListener('fb-ready',cb,{once:true});}
+
+async function doLogin(){
+  const pw = document.getElementById('l-pw').value;
+  const err = document.getElementById('l-err');
+  err.textContent = '';
+  if(!pw){err.textContent='Enter your password.';return;}
+  try{
+    const cred = await window._signIn(window._auth, OWNER_EMAIL, pw);
+    currentUser = cred.user;
+    // Auto-register owner in /admins if not already there
+    await new Promise(resolve=>waitFB(()=>{
+      const unsub=window._onValue(
+        window._ref(window._db,'admins/'+currentUser.uid),
+        snap=>{
+          unsub();
+          if(!snap.exists()){
+            window._set(window._ref(window._db,'admins/'+currentUser.uid),{
+              email:currentUser.email,
+              displayName:currentUser.displayName||'',
+              createdAt:Date.now()
+            }).catch(()=>{});
+          }
+          resolve();
+        },
+        _err=>{ resolve(); } // RTDB rules not yet updated — continue anyway
+      );
+    }));
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('panel').classList.remove('hidden');
+    listenUsers();
+    toast('Signed in');
+  }catch(e){
+    err.textContent = e.code==='auth/invalid-credential'?'Incorrect password.'
+      : e.code==='auth/too-many-requests'?'Too many attempts. Try later.'
+      : 'Login failed.';
+  }
+}
+
+async function doSignOut(){
+  await window._signOut(window._auth);
+  currentUser = null;
+  document.getElementById('panel').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('l-pw').value = '';
+}
+
+function listenUsers(){
+  waitFB(()=>{
+    window._onValue(
+      window._ref(window._db,'admins'),
+      snap=>{ renderUsers(snap.val()||{}); },
+      err=>{
+        const list=document.getElementById('user-list');
+        list.innerHTML=`<div class="user-empty" style="color:var(--red);">
+          DATABASE READ FAILED<br>
+          <span style="font-size:8px;opacity:0.7;">${err.message}<br>Check Firebase RTDB rules — add "admins" path.</span>
+        </div>`;
+      }
+    );
+  });
+}
+
+function renderUsers(admins){
+  const list = document.getElementById('user-list');
+  list.innerHTML = '';
+  const entries = Object.entries(admins);
+  if(!entries.length){
+    const empty = document.createElement('div');
+    empty.className = 'user-empty';
+    empty.textContent = 'NO USERS YET';
+    list.appendChild(empty);
+    return;
+  }
+  // Sort: current user first, then alphabetical by display name
+  entries.sort(([aUid,a],[bUid,b])=>{
+    if(aUid===currentUser?.uid) return -1;
+    if(bUid===currentUser?.uid) return 1;
+    return (a.displayName||a.email).localeCompare(b.displayName||b.email);
+  });
+  entries.forEach(([uid, u])=>{
+    const isYou = uid === currentUser?.uid;
+    const row = document.createElement('div');row.className='user-row';
+    const info = document.createElement('div');info.className='user-info';
+    const nameRow = document.createElement('div');nameRow.className='user-name';
+    nameRow.textContent = (u.displayName||'—').toUpperCase();
+    if(isYou){const tag=document.createElement('span');tag.className='user-tag you';tag.textContent='YOU';nameRow.appendChild(tag);}
+    const email = document.createElement('div');email.className='user-email';email.textContent=u.email;
+    info.appendChild(nameRow);info.appendChild(email);row.appendChild(info);
+    if(!isYou){
+      const btn = document.createElement('button');btn.className='abtn danger';btn.textContent='REMOVE';
+      btn.addEventListener('click',()=>removeUser(uid, u.email));
+      row.appendChild(btn);
+    }
+    list.appendChild(row);
+  });
+}
+
+async function addUser(){
+  const email = document.getElementById('u-email').value.trim();
+  const pw = document.getElementById('u-pw').value.trim();
+  if(!email||!pw){toast('Enter email and password');return;}
+  try{
+    // Create the Firebase Auth account via REST API.
+    // Using fetch keeps our current owner session intact (SDK auth state unchanged).
+    const res = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`,
+      {method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({email,password:pw,returnSecureToken:false})}
+    );
+    const data = await res.json();
+    if(data.error) throw new Error(data.error.message);
+    const uid = data.localId;
+    // Store in /admins so admin.html recognises them
+    await new Promise((resolve,reject)=>waitFB(()=>{
+      window._set(window._ref(window._db,'admins/'+uid),{
+        email, displayName:'', createdAt:Date.now()
+      }).then(resolve).catch(reject);
+    }));
+    document.getElementById('u-email').value='';
+    document.getElementById('u-pw').value='';
+    toast('User added — '+email);
+  }catch(e){
+    const msg = e.message||'';
+    toast(
+      msg.includes('EMAIL_EXISTS')      ? 'That email already has an account'
+    : msg.includes('WEAK_PASSWORD')     ? 'Password too weak (min 6 characters)'
+    : msg.includes('INVALID_EMAIL')     ? 'Invalid email address'
+    : 'Failed: '+msg
+    );
+  }
+}
+
+async function removeUser(uid, email){
+  if(!confirm('Remove admin access for '+email+'?\n\nThey will no longer be able to sign into the admin panel.'))return;
+  waitFB(async()=>{
+    await window._remove(window._ref(window._db,'admins/'+uid));
+    await window._set(window._ref(window._db,'blocked/'+uid),{email,blockedAt:Date.now()});
+    toast('Access removed — '+email);
+  });
+}
+
+let toastT;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2800);}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&currentUser)doSignOut();});
+</script>
+</body>
+</html>
