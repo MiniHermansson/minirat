@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fearless Draft — Users</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script>document.documentElement.setAttribute('data-theme',localStorage.getItem('fearless-theme')||'dark');</script>
 <script type="module">
   import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import{getAuth,signInWithEmailAndPassword,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -97,6 +98,24 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
   font-size:12px;letter-spacing:1px;padding:8px 16px;opacity:0;transform:translateY(8px);
   transition:all .2s;pointer-events:none;}
 #toast.show{opacity:1;transform:translateY(0);}
+
+/* ── LIGHT MODE ── */
+html[data-theme="light"]{
+  --bg:#EEECEA; --surface:#FFFFFF; --surface2:#E3E1EE;
+  --border:rgba(110,80,8,0.3); --text:#16141E; --dim:#5C5878;
+  --gold:#7A5E0A; --gold-dim:#8A6C14; --gold-bg:rgba(122,94,10,0.1);
+  --red:#B83030; --red-bg:rgba(184,48,48,0.1); --red-border:rgba(184,48,48,0.5);}
+html[data-theme="light"] body::before{
+  background:
+    radial-gradient(ellipse 70% 30% at 50% 0%,rgba(122,94,10,0.07) 0%,transparent 60%);}
+html[data-theme="light"] nav{background:rgba(238,236,234,0.97);}
+html[data-theme="light"] .login-box{background:var(--surface);}
+html[data-theme="light"] .user-name{color:#7A5E0A;}
+html[data-theme="light"] .user-tag.you{color:#5C5878;border-color:rgba(110,80,8,0.3);}
+html[data-theme="light"] #toast{color:var(--text);}
+.theme-btn{background:none;border:1px solid var(--border);color:var(--gold);font-size:14px;
+  width:30px;height:30px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;padding:0;}
+.theme-btn:hover{border-color:var(--gold);background:var(--gold-bg);}
 </style>
 </head>
 <body>
@@ -117,6 +136,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
   <nav>
     <div class="nav-logo">FEARLESS <span>USERS</span></div>
     <div class="nav-right">
+      <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark"></button>
       <a class="nav-btn" href="admin.html">ADMIN PANEL</a>
       <button class="nav-btn danger" onclick="doSignOut()">SIGN OUT</button>
     </div>
@@ -305,6 +325,16 @@ let toastT;
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2800);}
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&currentUser)doSignOut();});
+
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme')||'dark';
+  const next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('fearless-theme',next);
+  document.getElementById('theme-toggle').textContent=next==='dark'?'☀':'☽';
+}
+document.getElementById('theme-toggle').textContent=
+  (localStorage.getItem('fearless-theme')||'dark')==='dark'?'☀':'☽';
 </script>
 </body>
 </html>

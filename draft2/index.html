@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fearless Draft</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script>document.documentElement.setAttribute('data-theme',localStorage.getItem('fearless-theme')||'dark');</script>
 <style>
 :root {
   --gold:#D4A843; --gold-dim:rgba(212,168,67,0.55); --gold-bg:rgba(212,168,67,0.12);
@@ -109,12 +110,46 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
   font-size:12px;letter-spacing:1px;padding:8px 16px;opacity:0;transform:translateY(8px);
   transition:all .2s;pointer-events:none;}
 #toast.show{opacity:1;transform:translateY(0);}
+
+/* ── LIGHT MODE ── */
+html[data-theme="light"]{
+  --bg:#EEECEA; --surface:#FFFFFF; --surface2:#E3E1EE;
+  --border:rgba(110,80,8,0.3); --text:#16141E; --dim:#5C5878;
+  --gold:#7A5E0A; --gold-dim:#8A6C14; --gold-bg:rgba(122,94,10,0.1);
+  --blue:#1A7AAA; --blue-bg:rgba(26,122,170,0.1); --blue-border:rgba(26,122,170,0.5);
+  --red:#B83030; --red-bg:rgba(184,48,48,0.1); --red-border:rgba(184,48,48,0.5);}
+html[data-theme="light"] body::before{
+  background:
+    radial-gradient(ellipse 70% 30% at 50% 0%,rgba(122,94,10,0.07) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 80% at 0% 50%,rgba(26,122,170,0.05) 0%,transparent 55%),
+    radial-gradient(ellipse 30% 80% at 100% 50%,rgba(184,48,48,0.05) 0%,transparent 55%);}
+html[data-theme="light"] nav{background:rgba(238,236,234,0.97);}
+/* Hardcoded light-on-dark colors that need explicit overrides */
+html[data-theme="light"] .team-hero,
+html[data-theme="light"] .score-nums{color:var(--text);}
+html[data-theme="light"] .pick-slot-name{color:#16141E;}
+html[data-theme="light"] .pick-slot-role{color:#8A6C14;}
+html[data-theme="light"] .tc-bans-lbl{color:#8A6C14;}
+html[data-theme="light"] .ci .ctip,
+html[data-theme="light"] .gchip .gtip{background:#FFFFFF;color:#7A5E0A;border-color:rgba(110,80,8,0.3);}
+html[data-theme="light"] .gchip img{border-color:rgba(0,0,0,0.15);}
+html[data-theme="light"] .grave-role-lbl{color:#8A6C14;
+  background-image:linear-gradient(to right,transparent,rgba(110,80,8,0.3) 20%,rgba(110,80,8,0.3) 80%,transparent);}
+html[data-theme="light"] #toast{color:var(--text);}
+html[data-theme="light"] .game-lbl{background:var(--surface2);}
+html[data-theme="light"] .game-footer.won{background:rgba(122,94,10,0.15);border-color:rgba(122,94,10,0.5);}
+.theme-btn{background:none;border:1px solid var(--border);color:var(--gold);font-size:14px;
+  width:30px;height:30px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;padding:0;}
+.theme-btn:hover{border-color:var(--gold);background:var(--gold-bg);}
 </style>
 </head>
 <body>
 <nav>
   <div class="nav-logo">FEARLESS <span>SERIES</span></div>
-  <a class="nav-btn" href="admin.html">ADMIN</a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark"></button>
+    <a class="nav-btn" href="admin.html">ADMIN</a>
+  </div>
 </nav>
 <div class="series-header">
   <div class="team-hero t1" id="d-t1">TEAM 1</div>
@@ -327,6 +362,16 @@ async function init(){
   initFirebase();
 }
 init();
+
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme')||'dark';
+  const next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('fearless-theme',next);
+  document.getElementById('theme-toggle').textContent=next==='dark'?'☀':'☽';
+}
+document.getElementById('theme-toggle').textContent=
+  (localStorage.getItem('fearless-theme')||'dark')==='dark'?'☀':'☽';
 </script>
 </body>
 </html>
