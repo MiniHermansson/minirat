@@ -156,6 +156,30 @@ a.nav-btn{line-height:normal;}
 /* EMPTY */
 .posts-empty{text-align:center;padding:30px;font-family:'Share Tech Mono',monospace;
   font-size:11px;letter-spacing:2px;color:var(--dim);}
+
+/* GALLERY PREVIEW */
+.preview-note{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
+  color:var(--dim);margin-bottom:14px;}
+.preview-masonry{columns:3;column-gap:8px;}
+@media(max-width:700px){.preview-masonry{columns:2;}}
+.preview-item{break-inside:avoid;margin-bottom:8px;cursor:grab;}
+.preview-item:active{cursor:grabbing;}
+.preview-item.dragging{opacity:.35;}
+.preview-item.drag-over .preview-img,
+.preview-item.drag-over .preview-msg{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
+.preview-img{background:var(--surface2);border:1px solid var(--border);overflow:hidden;position:relative;transition:border-color .15s;}
+.preview-img img{width:100%;display:block;}
+.preview-img .preview-num{position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);
+  border:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:9px;
+  color:var(--gold);padding:1px 5px;letter-spacing:1px;}
+.preview-msg{background:var(--surface2);border:1px solid var(--border);padding:10px 12px;
+  position:relative;transition:border-color .15s;}
+.preview-msg-mark{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold-dim);line-height:.8;display:block;margin-bottom:6px;}
+.preview-msg-text{font-size:11px;color:var(--dim);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+.preview-msg .preview-num{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.7);
+  border:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:9px;
+  color:var(--gold);padding:1px 5px;letter-spacing:1px;}
 </style>
 </head>
 <body>
@@ -222,9 +246,19 @@ a.nav-btn{line-height:normal;}
       <button class="abtn primary" id="msg-btn">POST MESSAGE</button>
     </div>
 
+    <!-- GALLERY PREVIEW (interactive) -->
+    <div class="asec">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid var(--border);">
+        <div class="asec-title" style="padding:0;margin:0;border:none;">Gallery — drag to reorder</div>
+        <button class="abtn primary" id="shuffle-btn" style="font-size:11px;padding:5px 14px;">SHUFFLE</button>
+      </div>
+      <div class="preview-note">drag images and messages to reorder — reflects the live gallery layout</div>
+      <div class="preview-masonry" id="preview-masonry"></div>
+    </div>
+
     <!-- MANAGE POSTS -->
     <div class="asec">
-      <div class="asec-title">All Posts — drag to reorder</div>
+      <div class="asec-title">All Posts — edit captions & delete</div>
       <div class="posts-list" id="posts-list">
         <div class="posts-empty">loading...</div>
       </div>
@@ -404,6 +438,7 @@ function listenPosts(){
     snap.forEach(c=>{allPosts.push({id:c.key,...c.val()});});
     allPosts.sort((a,b)=>(a.order??99999)-(b.order??99999));
     renderPostsList();
+    renderPreview();
   });
 }
 
@@ -465,6 +500,7 @@ function renderPostsList(){
       const moved=allPosts.splice(dragSrcIndex,1)[0];
       allPosts.splice(targetIndex,0,moved);
       saveOrder();
+      renderPreview();
       dragSrcIndex=null;
     });
 
@@ -495,6 +531,68 @@ function saveOrder(){
   const updates={};
   allPosts.forEach((p,i)=>{updates[`tribute/posts/${p.id}/order`]=i;});
   window._update(window._ref(window._db),updates);
+}
+
+let previewDragSrc=null;
+
+document.getElementById('shuffle-btn').addEventListener('click',()=>{
+  for(let i=allPosts.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [allPosts[i],allPosts[j]]=[allPosts[j],allPosts[i]];
+  }
+  saveOrder();
+  renderPreview();
+  renderPostsList();
+  showToast('shuffled','success');
+});
+
+function renderPreview(){
+  const wrap=document.getElementById('preview-masonry');
+  wrap.innerHTML='';
+  allPosts.forEach((p,i)=>{
+    const item=document.createElement('div');
+    item.className='preview-item';
+    item.draggable=true;
+    item.dataset.index=i;
+    if(p.type==='image'){
+      item.innerHTML=`<div class="preview-img">
+        <img src="${p.url}" alt="" loading="lazy">
+        <span class="preview-num">${i+1}</span>
+      </div>`;
+    } else {
+      item.innerHTML=`<div class="preview-msg">
+        <span class="preview-num">${i+1}</span>
+        <span class="preview-msg-mark">"</span>
+        <div class="preview-msg-text">${escHtml(p.content||'')}</div>
+      </div>`;
+    }
+    item.addEventListener('dragstart',e=>{
+      previewDragSrc=i;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    item.addEventListener('dragend',()=>{
+      item.classList.remove('dragging');
+      wrap.querySelectorAll('.preview-item').forEach(el=>el.classList.remove('drag-over'));
+    });
+    item.addEventListener('dragover',e=>{
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      wrap.querySelectorAll('.preview-item').forEach(el=>el.classList.remove('drag-over'));
+      item.classList.add('drag-over');
+    });
+    item.addEventListener('drop',e=>{
+      e.preventDefault();
+      const target=parseInt(item.dataset.index);
+      if(previewDragSrc===null||previewDragSrc===target)return;
+      const moved=allPosts.splice(previewDragSrc,1)[0];
+      allPosts.splice(target,0,moved);
+      previewDragSrc=null;
+      saveOrder();
+      renderPostsList();
+    });
+    wrap.appendChild(item);
+  });
 }
 
 async function deletePost(id,storePath){

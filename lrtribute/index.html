@@ -73,12 +73,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .gallery-empty{text-align:center;padding:80px 20px;color:var(--dim);
   font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;}
 
-/* ALT LINK */
-.alt-link{text-align:center;padding:0 0 40px;position:relative;z-index:1;}
-.alt-link a{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;
-  color:var(--dim);text-decoration:none;border-bottom:1px solid rgba(208,208,224,0.2);
-  padding-bottom:2px;transition:color .2s,border-color .2s;}
-.alt-link a:hover{color:var(--gold);border-color:var(--gold-dim);}
 
 /* LIGHTBOX */
 .lightbox{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;
@@ -129,9 +123,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <button class="lb-arrow next" id="lb-next">›</button>
 </div>
 
-<div class="alt-link">
-  <a href="index-single.html">switch to single-column view</a>
-</div>
 
 <script>
 let imagePosts=[];
