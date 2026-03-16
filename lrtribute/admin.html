@@ -128,6 +128,13 @@ a.nav-btn{line-height:normal;}
 .post-row-type{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold-dim);}
 .post-row-preview{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .post-row-meta{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);margin-top:2px;}
+.caption-edit{background:var(--bg);border:1px solid var(--border);color:var(--text);
+  font-family:'Rajdhani',sans-serif;font-size:12px;padding:4px 7px;outline:none;
+  width:100%;margin-top:5px;transition:border-color .2s;}
+.caption-edit:focus{border-color:var(--gold);}
+.caption-edit::placeholder{color:var(--dim);}
+.post-row-filename{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);
+  letter-spacing:.5px;margin-top:3px;opacity:.6;}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);
@@ -336,7 +343,8 @@ async function uploadImages(){
     const {file,captionEl}=pendingFiles[i];
     const caption=captionEl.value.trim();
     const ext=file.name.slice(file.name.lastIndexOf('.')).replace(/[^a-zA-Z0-9.]/g,'').toLowerCase();
-    const storePath=`tribute/${currentUser.uid}/${Date.now()}${ext}`;
+    const short=Date.now().toString(36).slice(-10);
+    const storePath=`tribute/${currentUser.uid}/${short}${ext}`;
     const storageRef=window._sref(window._storage,storePath);
     progressLabel.textContent=`uploading ${i+1} of ${total}: ${file.name}`;
 
@@ -422,12 +430,15 @@ function renderPostsList(){
 
     const date=new Date(p.timestamp||0).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 
+    const captionVal=p.type==='image'?(p.caption||''):(p.content||'');
+    const captionPlaceholder=p.type==='image'?'add caption…':'edit message…';
     row.innerHTML=`<span class="drag-handle">⠿</span>
       ${thumbHtml}
       <div class="post-info">
         <div class="post-row-type">${p.type==='image'?'IMAGE':'MESSAGE'}</div>
-        <div class="post-row-preview">${escHtml(preview)}</div>
         <div class="post-row-meta">${escHtml(p.author||'')} · ${date}</div>
+        <input class="caption-edit" type="text" value="${escHtml(captionVal)}" placeholder="${captionPlaceholder}" data-id="${p.id}" data-field="${p.type==='image'?'caption':'content'}">
+        ${p.type==='image'&&p.storePath?`<div class="post-row-filename">${escHtml(p.storePath.split('/').pop())}</div>`:''}
       </div>
       <button class="abtn danger delete-btn" data-id="${p.id}" data-store="${p.storePath||''}">DELETE</button>`;
 
@@ -463,6 +474,18 @@ function renderPostsList(){
       const storePath=e.currentTarget.dataset.store;
       deletePost(id,storePath);
     });
+
+    const captionInput=row.querySelector('.caption-edit');
+    captionInput.addEventListener('mousedown',e=>e.stopPropagation());
+    captionInput.addEventListener('dragstart',e=>e.stopPropagation());
+    function saveCaption(){
+      const id=captionInput.dataset.id;
+      const field=captionInput.dataset.field;
+      const val=captionInput.value.trim();
+      window._update(window._ref(window._db),{[`tribute/posts/${id}/${field}`]:val});
+    }
+    captionInput.addEventListener('blur',saveCaption);
+    captionInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();captionInput.blur();}});
 
     list.appendChild(row);
   });
