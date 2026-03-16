@@ -36,6 +36,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 /* HEADER */
 .site-header{text-align:center;padding:72px 24px 48px;position:relative;z-index:1;}
+.site-logo-img{width:clamp(80px,14vw,160px);margin-bottom:20px;opacity:.92;
+  filter:drop-shadow(0 0 30px rgba(212,168,67,0.3));}
 .site-logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,10vw,96px);
   letter-spacing:12px;color:var(--gold);line-height:1;
   text-shadow:0 0 60px rgba(212,168,67,0.25);}
@@ -97,6 +99,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 </head>
 <body>
 <header class="site-header">
+  <img class="site-logo-img" src="../los-ratones-logo.png" alt="Los Ratones">
   <div class="site-logo">LOS RATONES</div>
   <div class="site-sub">Don't cry because it's over. Smile because it happened.</div>
   <div class="header-divider"></div>
