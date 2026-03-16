@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LR Tribute — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script type="module">
+  import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import{getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import{getDatabase,ref,onValue,push,update,remove,get}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import{getStorage,ref as sref,uploadBytesResumable,getDownloadURL,deleteObject}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+  const cfg={apiKey:"AIzaSyCHx89HHT-nHlP7kcNCTT21-2S7jvI9G-c",authDomain:"miniratxyz.firebaseapp.com",
+    databaseURL:"https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:"miniratxyz",storageBucket:"miniratxyz.firebasestorage.app",
+    messagingSenderId:"524360710142",appId:"1:524360710142:web:a99846767a02914a35b2af"};
+  const app=initializeApp(cfg);
+  const auth=getAuth(app);
+  const db=getDatabase(app);
+  const storage=getStorage(app);
+
+  window._auth=auth; window._db=db; window._storage=storage;
+  window._ref=ref; window._sref=sref; window._onValue=onValue;
+  window._push=push; window._update=update; window._remove=remove; window._get=get;
+  window._uploadBytesResumable=uploadBytesResumable; window._getDownloadURL=getDownloadURL;
+  window._deleteObject=deleteObject;
+  window._signIn=signInWithEmailAndPassword; window._signOut=signOut; window._onAuth=onAuthStateChanged;
+  window._fbReady=true; document.dispatchEvent(new Event('fb-ready'));
+</script>
+<style>
+:root{
+  --gold:#D4A843;--gold-dim:rgba(212,168,67,0.55);--gold-bg:rgba(212,168,67,0.12);
+  --bg:#07070D;--surface:#131320;--surface2:#1A1A2A;
+  --border:rgba(212,168,67,0.25);--text:#D0D0E0;--dim:rgba(208,208,224,0.55);
+  --red:#F55555;--red-bg:rgba(245,85,85,0.10);--red-border:rgba(245,85,85,0.4);
+  --green:#4ade80;--green-bg:rgba(74,222,128,0.10);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 70% 30% at 50% 0%,rgba(212,168,67,0.08) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 80% at 0% 50%,rgba(212,168,67,0.04) 0%,transparent 55%),
+    radial-gradient(ellipse 30% 80% at 100% 50%,rgba(212,168,67,0.04) 0%,transparent 55%);}
+.hidden{display:none!important;}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;
+  background:var(--bg);}
+.login-box{background:var(--surface);border:1px solid var(--border);padding:32px 28px;width:100%;max-width:360px;}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:5px;color:var(--gold);margin-bottom:4px;}
+.login-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--dim);margin-bottom:24px;}
+.login-err{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--red);margin-bottom:12px;display:none;}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24px;
+  border-bottom:1px solid var(--border);background:rgba(7,7,13,0.97);backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:200;}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:4px;color:var(--gold);}
+.nav-logo span{color:var(--dim);font-size:11px;letter-spacing:2px;margin-left:8px;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-user{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:1px;}
+.nav-btn{background:none;border:1px solid var(--border);color:var(--text);font-family:'Rajdhani',sans-serif;
+  font-size:12px;letter-spacing:1.5px;padding:5px 16px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.nav-btn:hover{border-color:var(--gold);color:var(--gold);}
+.nav-btn.danger{border-color:var(--red-border);color:var(--red);}
+.nav-btn.danger:hover{background:var(--red-bg);}
+a.nav-btn{line-height:normal;}
+
+/* CONTENT */
+.admin-wrap{max-width:900px;margin:0 auto;padding:24px 16px 100px;position:relative;z-index:1;}
+.admin-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:var(--gold);}
+.admin-sub{font-size:11px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:24px;font-family:'Share Tech Mono',monospace;}
+
+.asec{background:var(--surface);border:1px solid var(--border);padding:18px;margin-bottom:16px;}
+.asec-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--gold);
+  padding-bottom:10px;margin-bottom:14px;border-bottom:1px solid var(--border);}
+
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.flabel{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;}
+.fi,.fta{background:var(--bg);border:1px solid var(--border);color:var(--text);
+  font-family:'Rajdhani',sans-serif;font-size:13px;padding:8px 10px;outline:none;transition:border-color .2s;width:100%;}
+.fi:focus,.fta:focus{border-color:var(--gold);}
+.fta{resize:vertical;min-height:100px;}
+
+.abtn{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;padding:8px 20px;
+  cursor:pointer;border:1px solid;transition:all .2s;}
+.abtn.primary{background:var(--gold-bg);border-color:var(--gold);color:var(--gold);}
+.abtn.primary:hover{background:rgba(212,168,67,0.22);}
+.abtn.primary:disabled{opacity:.4;cursor:not-allowed;}
+.abtn.danger{background:var(--red-bg);border-color:var(--red-border);color:var(--red);
+  font-size:11px;padding:5px 12px;}
+.abtn.danger:hover{background:rgba(245,85,85,0.2);}
+
+/* IMAGE PREVIEWS */
+.img-previews{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+.img-preview-item{position:relative;width:90px;height:90px;border:1px solid var(--border);overflow:hidden;}
+.img-preview-item img{width:100%;height:100%;object-fit:cover;}
+.img-preview-item .remove-preview{position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.75);
+  border:none;color:var(--red);cursor:pointer;font-size:14px;width:20px;height:20px;
+  display:flex;align-items:center;justify-content:center;line-height:1;}
+.img-preview-item .caption-input{position:absolute;bottom:0;left:0;right:0;
+  background:rgba(0,0,0,0.8);border:none;border-top:1px solid var(--border);
+  color:var(--text);font-family:'Rajdhani',sans-serif;font-size:11px;padding:3px 5px;
+  outline:none;width:100%;}
+.img-preview-item .caption-input::placeholder{color:var(--dim);}
+
+/* PROGRESS */
+.upload-progress{margin-top:10px;display:none;}
+.progress-bar-wrap{background:var(--surface2);border:1px solid var(--border);height:6px;margin-bottom:4px;}
+.progress-bar{height:100%;background:var(--gold);transition:width .2s;width:0%;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:1px;}
+
+/* POSTS LIST */
+.posts-list{display:flex;flex-direction:column;gap:8px;}
+.post-row{background:var(--surface2);border:1px solid var(--border);padding:10px 12px;
+  display:flex;align-items:center;gap:12px;cursor:grab;user-select:none;transition:background .15s,border-color .15s;}
+.post-row:active{cursor:grabbing;}
+.post-row.drag-over{border-color:var(--gold);background:var(--gold-bg);}
+.post-row.dragging{opacity:.4;}
+.drag-handle{font-size:18px;color:var(--dim);flex-shrink:0;cursor:grab;line-height:1;}
+.post-thumb{width:44px;height:44px;flex-shrink:0;overflow:hidden;border:1px solid var(--border);}
+.post-thumb img{width:100%;height:100%;object-fit:cover;}
+.post-thumb.msg-thumb{display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold-dim);}
+.post-info{flex:1;min-width:0;}
+.post-row-type{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold-dim);}
+.post-row-preview{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.post-row-meta{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);margin-top:2px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);
+  padding:10px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;
+  color:var(--text);z-index:9999;opacity:0;transform:translateY(10px);
+  transition:opacity .25s,transform .25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.success{border-color:var(--green);color:var(--green);}
+.toast.error{border-color:var(--red-border);color:var(--red);}
+
+/* FILE INPUT */
+.file-drop{border:2px dashed var(--border);padding:20px;text-align:center;cursor:pointer;
+  transition:border-color .2s;position:relative;}
+.file-drop:hover,.file-drop.drag-active{border-color:var(--gold);}
+.file-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.file-drop-label{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--dim);}
+.file-drop-label span{color:var(--gold);}
+
+/* EMPTY */
+.posts-empty{text-align:center;padding:30px;font-family:'Share Tech Mono',monospace;
+  font-size:11px;letter-spacing:2px;color:var(--dim);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-title">LR Tribute</div>
+    <div class="login-sub">admin access</div>
+    <div class="login-err" id="login-err"></div>
+    <div class="fg">
+      <label class="flabel">email</label>
+      <input class="fi" type="email" id="login-email" placeholder="admin@example.com" autocomplete="email">
+    </div>
+    <div class="fg">
+      <label class="flabel">password</label>
+      <input class="fi" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="abtn primary" id="login-btn" style="width:100%;margin-top:6px;">SIGN IN</button>
+  </div>
+</div>
+
+<!-- MAIN PANEL (hidden until logged in) -->
+<div id="admin-panel" class="hidden">
+  <nav>
+    <div class="nav-logo">LR Tribute <span>ADMIN</span></div>
+    <div class="nav-right">
+      <a href="index.html" class="nav-btn" target="_blank">VIEW GALLERY ↗</a>
+      <span class="nav-user" id="nav-user"></span>
+      <button class="nav-btn danger" id="signout-btn">SIGN OUT</button>
+    </div>
+  </nav>
+
+  <div class="admin-wrap">
+    <div class="admin-title">Manage Tribute</div>
+    <div class="admin-sub" id="admin-sub">upload images and messages</div>
+
+    <!-- UPLOAD IMAGE -->
+    <div class="asec">
+      <div class="asec-title">Upload Images</div>
+      <div class="file-drop" id="file-drop">
+        <input type="file" id="file-input" accept="image/*" multiple>
+        <div class="file-drop-label">drag & drop images here or <span>click to browse</span></div>
+      </div>
+      <div class="img-previews" id="img-previews"></div>
+      <div class="upload-progress" id="upload-progress">
+        <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+        <div class="progress-label" id="progress-label">uploading...</div>
+      </div>
+      <button class="abtn primary" id="upload-btn" style="margin-top:12px;" disabled>UPLOAD IMAGES</button>
+    </div>
+
+    <!-- POST MESSAGE -->
+    <div class="asec">
+      <div class="asec-title">Post a Message</div>
+      <div class="fg">
+        <label class="flabel">author name</label>
+        <input class="fi" type="text" id="msg-author" placeholder="your name">
+      </div>
+      <div class="fg">
+        <label class="flabel">message</label>
+        <textarea class="fta" id="msg-content" placeholder="write your tribute message here..."></textarea>
+      </div>
+      <button class="abtn primary" id="msg-btn">POST MESSAGE</button>
+    </div>
+
+    <!-- MANAGE POSTS -->
+    <div class="asec">
+      <div class="asec-title">All Posts — drag to reorder</div>
+      <div class="posts-list" id="posts-list">
+        <div class="posts-empty">loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let currentUser=null;
+let pendingFiles=[]; // [{file, previewEl, captionEl}]
+let allPosts=[]; // [{id, ...data}]
+let dragSrcIndex=null;
+
+// ─── Firebase wait ────────────────────────────────────────────────────────────
+function onFbReady(cb){if(window._fbReady)cb();else document.addEventListener('fb-ready',cb,{once:true});}
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+onFbReady(()=>{
+  window._onAuth(window._auth,user=>{
+    if(user){
+      currentUser=user;
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('admin-panel').classList.remove('hidden');
+      document.getElementById('nav-user').textContent=user.email;
+      document.getElementById('msg-author').value=user.displayName||'';
+      listenPosts();
+    } else {
+      currentUser=null;
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('admin-panel').classList.add('hidden');
+    }
+  });
+});
+
+document.getElementById('login-btn').addEventListener('click',doLogin);
+document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-err');
+  errEl.style.display='none';
+  if(!email||!pass)return;
+  document.getElementById('login-btn').textContent='SIGNING IN...';
+  window._signIn(window._auth,email,pass).catch(err=>{
+    errEl.textContent=err.code==='auth/invalid-credential'?'invalid email or password.':err.message;
+    errEl.style.display='block';
+    document.getElementById('login-btn').textContent='SIGN IN';
+  });
+}
+document.getElementById('signout-btn').addEventListener('click',()=>{
+  window._signOut(window._auth);
+});
+
+// ─── File picker ──────────────────────────────────────────────────────────────
+const fileInput=document.getElementById('file-input');
+const fileDrop=document.getElementById('file-drop');
+
+fileDrop.addEventListener('dragover',e=>{e.preventDefault();fileDrop.classList.add('drag-active');});
+fileDrop.addEventListener('dragleave',()=>fileDrop.classList.remove('drag-active'));
+fileDrop.addEventListener('drop',e=>{
+  e.preventDefault();fileDrop.classList.remove('drag-active');
+  addFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change',()=>{addFiles(fileInput.files);fileInput.value='';});
+
+function addFiles(files){
+  Array.from(files).forEach(file=>{
+    if(!file.type.startsWith('image/'))return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const item=document.createElement('div');
+      item.className='img-preview-item';
+      item.innerHTML=`<img src="${e.target.result}" alt="">
+        <button class="remove-preview" title="remove">×</button>
+        <input class="caption-input" type="text" placeholder="caption…" maxlength="120">`;
+      item.querySelector('.remove-preview').addEventListener('click',()=>{
+        const idx=pendingFiles.findIndex(p=>p.previewEl===item);
+        if(idx>-1)pendingFiles.splice(idx,1);
+        item.remove();
+        updateUploadBtn();
+      });
+      document.getElementById('img-previews').appendChild(item);
+      pendingFiles.push({file,previewEl:item,captionEl:item.querySelector('.caption-input')});
+      updateUploadBtn();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function updateUploadBtn(){
+  document.getElementById('upload-btn').disabled=pendingFiles.length===0;
+}
+
+// ─── Upload images ────────────────────────────────────────────────────────────
+document.getElementById('upload-btn').addEventListener('click',uploadImages);
+async function uploadImages(){
+  if(!pendingFiles.length||!currentUser)return;
+  const btn=document.getElementById('upload-btn');
+  btn.disabled=true;
+  const progressWrap=document.getElementById('upload-progress');
+  const progressBar=document.getElementById('progress-bar');
+  const progressLabel=document.getElementById('progress-label');
+  progressWrap.style.display='block';
+
+  const total=pendingFiles.length;
+  let done=0;
+  let failed=0;
+
+  // Get current max order
+  const nextOrder=await getNextOrder();
+
+  for(let i=0;i<pendingFiles.length;i++){
+    const {file,captionEl}=pendingFiles[i];
+    const caption=captionEl.value.trim();
+    const storePath=`tribute/${currentUser.uid}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    const storageRef=window._sref(window._storage,storePath);
+    progressLabel.textContent=`uploading ${i+1} of ${total}: ${file.name}`;
+
+    const ok=await new Promise((resolve)=>{
+      const task=window._uploadBytesResumable(storageRef,file);
+      task.on('state_changed',
+        snap=>{
+          const pct=((done+failed)/total+(snap.bytesTransferred/snap.totalBytes)/total)*100;
+          progressBar.style.width=pct+'%';
+        },
+        err=>{showToast('upload failed: '+err.message,'error');resolve(false);},
+        ()=>{
+          window._getDownloadURL(task.snapshot.ref).then(url=>{
+            return window._push(window._ref(window._db,'tribute/posts'),{
+              type:'image',url,caption:caption||'',
+              storePath,
+              author:currentUser.displayName||currentUser.email,
+              timestamp:Date.now(),
+              order:nextOrder+i
+            });
+          }).then(()=>resolve(true))
+            .catch(err=>{showToast('save failed: '+err.message,'error');resolve(false);});
+        }
+      );
+    });
+    if(ok)done++;else failed++;
+  }
+
+  progressWrap.style.display='none';
+  progressBar.style.width='0%';
+  document.getElementById('img-previews').innerHTML='';
+  pendingFiles=[];
+  updateUploadBtn();
+  if(done>0)showToast(done===total?'images uploaded':`${done} of ${total} uploaded`,'success');
+}
+
+// ─── Post message ─────────────────────────────────────────────────────────────
+document.getElementById('msg-btn').addEventListener('click',async ()=>{
+  const author=document.getElementById('msg-author').value.trim();
+  const content=document.getElementById('msg-content').value.trim();
+  if(!content){showToast('message cannot be empty','error');return;}
+  const nextOrder=await getNextOrder();
+  await window._push(window._ref(window._db,'tribute/posts'),{
+    type:'message',content,
+    author:author||currentUser.displayName||currentUser.email,
+    timestamp:Date.now(),
+    order:nextOrder
+  });
+  document.getElementById('msg-content').value='';
+  showToast('message posted','success');
+});
+
+// ─── Listen & render posts ────────────────────────────────────────────────────
+function listenPosts(){
+  window._onValue(window._ref(window._db,'tribute/posts'),snap=>{
+    allPosts=[];
+    snap.forEach(c=>{allPosts.push({id:c.key,...c.val()});});
+    allPosts.sort((a,b)=>(a.order??99999)-(b.order??99999));
+    renderPostsList();
+  });
+}
+
+function renderPostsList(){
+  const list=document.getElementById('posts-list');
+  list.innerHTML='';
+  if(!allPosts.length){
+    list.innerHTML='<div class="posts-empty">no posts yet.</div>';
+    return;
+  }
+  allPosts.forEach((p,i)=>{
+    const row=document.createElement('div');
+    row.className='post-row';
+    row.draggable=true;
+    row.dataset.index=i;
+
+    const thumbHtml=p.type==='image'
+      ?`<div class="post-thumb"><img src="${p.url}" alt=""></div>`
+      :`<div class="post-thumb msg-thumb">"</div>`;
+
+    const preview=p.type==='image'
+      ?(p.caption||p.url.split('/').pop().split('?')[0])
+      :(p.content||'').slice(0,80);
+
+    const date=new Date(p.timestamp||0).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+
+    row.innerHTML=`<span class="drag-handle">⠿</span>
+      ${thumbHtml}
+      <div class="post-info">
+        <div class="post-row-type">${p.type==='image'?'IMAGE':'MESSAGE'}</div>
+        <div class="post-row-preview">${escHtml(preview)}</div>
+        <div class="post-row-meta">${escHtml(p.author||'')} · ${date}</div>
+      </div>
+      <button class="abtn danger delete-btn" data-id="${p.id}" data-store="${p.storePath||''}">DELETE</button>`;
+
+    row.addEventListener('dragstart',e=>{
+      dragSrcIndex=i;
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    row.addEventListener('dragend',()=>{
+      row.classList.remove('dragging');
+      document.querySelectorAll('.post-row').forEach(r=>r.classList.remove('drag-over'));
+    });
+    row.addEventListener('dragover',e=>{
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      document.querySelectorAll('.post-row').forEach(r=>r.classList.remove('drag-over'));
+      row.classList.add('drag-over');
+    });
+    row.addEventListener('drop',e=>{
+      e.preventDefault();
+      const targetIndex=parseInt(row.dataset.index);
+      if(dragSrcIndex===null||dragSrcIndex===targetIndex)return;
+      // Reorder array
+      const moved=allPosts.splice(dragSrcIndex,1)[0];
+      allPosts.splice(targetIndex,0,moved);
+      saveOrder();
+      dragSrcIndex=null;
+    });
+
+    row.querySelector('.delete-btn').addEventListener('click',e=>{
+      e.stopPropagation();
+      const id=e.currentTarget.dataset.id;
+      const storePath=e.currentTarget.dataset.store;
+      deletePost(id,storePath);
+    });
+
+    list.appendChild(row);
+  });
+}
+
+function saveOrder(){
+  const updates={};
+  allPosts.forEach((p,i)=>{updates[`tribute/posts/${p.id}/order`]=i;});
+  window._update(window._ref(window._db),updates);
+}
+
+async function deletePost(id,storePath){
+  if(!confirm('delete this post?'))return;
+  await window._remove(window._ref(window._db,`tribute/posts/${id}`));
+  if(storePath){
+    try{await window._deleteObject(window._sref(window._storage,storePath));}
+    catch(e){/* storage file may already be gone */}
+  }
+  showToast('post deleted','success');
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+async function getNextOrder(){
+  if(!allPosts.length)return 0;
+  return Math.max(...allPosts.map(p=>p.order??0))+1;
+}
+
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast'+(type?' '+type:'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
