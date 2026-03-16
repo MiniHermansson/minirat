@@ -335,7 +335,8 @@ async function uploadImages(){
   for(let i=0;i<pendingFiles.length;i++){
     const {file,captionEl}=pendingFiles[i];
     const caption=captionEl.value.trim();
-    const storePath=`tribute/${currentUser.uid}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    const ext=file.name.slice(file.name.lastIndexOf('.')).replace(/[^a-zA-Z0-9.]/g,'').toLowerCase();
+    const storePath=`tribute/${currentUser.uid}/${Date.now()}${ext}`;
     const storageRef=window._sref(window._storage,storePath);
     progressLabel.textContent=`uploading ${i+1} of ${total}: ${file.name}`;
 
