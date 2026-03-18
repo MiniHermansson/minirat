@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rekkles — Admin</title>
+<link rel="icon" href="/los-ratones-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script type="module">
+  import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import{getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import{getDatabase,ref,onValue,push,update,remove,get}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const cfg={apiKey:"AIzaSyCHx89HHT-nHlP7kcNCTT21-2S7jvI9G-c",authDomain:"miniratxyz.firebaseapp.com",
+    databaseURL:"https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:"miniratxyz",storageBucket:"miniratxyz.firebasestorage.app",
+    messagingSenderId:"524360710142",appId:"1:524360710142:web:a99846767a02914a35b2af"};
+  const app=initializeApp(cfg);
+  const auth=getAuth(app);
+  const db=getDatabase(app);
+
+  window._auth=auth; window._db=db;
+  window._ref=ref; window._onValue=onValue;
+  window._push=push; window._update=update; window._remove=remove; window._get=get;
+  window._signIn=signInWithEmailAndPassword; window._signOut=signOut; window._onAuth=onAuthStateChanged;
+  window._fbReady=true; document.dispatchEvent(new Event('fb-ready'));
+</script>
+<style>
+:root{
+  --accent:#E02E41;--accent-dim:rgba(224,46,65,0.55);--accent-bg:rgba(224,46,65,0.12);
+  --bg:#0A0A0A;--surface:#141414;--surface2:#1C1C1C;
+  --border:rgba(224,46,65,0.25);--text:#EDEDED;--dim:rgba(237,237,237,0.50);
+  --red:#F55555;--red-bg:rgba(245,85,85,0.10);--red-border:rgba(245,85,85,0.4);
+  --green:#4ade80;--green-bg:rgba(74,222,128,0.10);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 70% 30% at 50% 0%,rgba(224,46,65,0.08) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 80% at 0% 50%,rgba(224,46,65,0.04) 0%,transparent 55%),
+    radial-gradient(ellipse 30% 80% at 100% 50%,rgba(224,46,65,0.04) 0%,transparent 55%);}
+.hidden{display:none!important;}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;
+  background:var(--bg);}
+.login-box{background:var(--surface);border:1px solid var(--border);padding:32px 28px;width:100%;max-width:360px;}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:5px;color:var(--accent);margin-bottom:4px;}
+.login-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--dim);margin-bottom:24px;}
+.login-err{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--red);margin-bottom:12px;display:none;}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24px;
+  border-bottom:1px solid var(--border);background:rgba(10,10,10,0.97);backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:200;}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:4px;color:var(--accent);}
+.nav-logo span{color:var(--dim);font-size:11px;letter-spacing:2px;margin-left:8px;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-user{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:1px;}
+.nav-btn{background:none;border:1px solid var(--border);color:var(--text);font-family:'Rajdhani',sans-serif;
+  font-size:12px;letter-spacing:1.5px;padding:5px 16px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.nav-btn.danger{border-color:var(--red-border);color:var(--red);}
+.nav-btn.danger:hover{background:var(--red-bg);}
+a.nav-btn{line-height:normal;}
+
+/* CONTENT */
+.admin-wrap{max-width:900px;margin:0 auto;padding:24px 16px 100px;position:relative;z-index:1;}
+
+.asec{background:var(--surface);border:1px solid var(--border);padding:18px;margin-bottom:16px;}
+.asec-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--accent);
+  padding-bottom:10px;margin-bottom:14px;border-bottom:1px solid var(--border);}
+
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.flabel{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--accent-dim);text-transform:uppercase;}
+.fi,.fs,.fta{background:var(--bg);border:1px solid var(--border);color:var(--text);
+  font-family:'Rajdhani',sans-serif;font-size:13px;padding:8px 10px;outline:none;transition:border-color .2s;width:100%;}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--accent);}
+.fta{resize:vertical;min-height:80px;line-height:1.5;}
+.fs{cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23E02E41'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+
+/* DATE/TIME INPUTS — make picker icon & text visible */
+.fi[type="date"],.fi[type="time"]{color-scheme:dark;}
+.fi[type="date"]::-webkit-calendar-picker-indicator,
+.fi[type="time"]::-webkit-calendar-picker-indicator{
+  filter:invert(0.35) sepia(1) saturate(5) hue-rotate(330deg);cursor:pointer;}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;}
+@media(max-width:540px){.form-row{grid-template-columns:1fr;}}
+
+.abtn{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;padding:8px 20px;
+  cursor:pointer;border:1px solid;transition:all .2s;}
+.abtn.primary{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
+.abtn.primary:hover{background:rgba(224,46,65,0.22);}
+.abtn.primary:disabled{opacity:.4;cursor:not-allowed;}
+.abtn.secondary{background:none;border-color:var(--border);color:var(--dim);}
+.abtn.secondary:hover{border-color:var(--text);color:var(--text);}
+.abtn.danger{background:var(--red-bg);border-color:var(--red-border);color:var(--red);
+  font-size:11px;padding:5px 12px;}
+.abtn.danger:hover{background:rgba(245,85,85,0.2);}
+.btn-row{display:flex;gap:8px;margin-top:4px;}
+
+/* ITEMS LIST */
+.items-list{display:flex;flex-direction:column;gap:6px;margin-top:14px;}
+.item-row{background:var(--surface2);border:1px solid var(--border);padding:10px 12px;
+  display:flex;align-items:center;gap:12px;transition:background .15s;}
+.item-info{flex:1;min-width:0;}
+.item-category{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--accent-dim);}
+.item-name{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-meta{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);margin-top:2px;}
+.item-actions{display:flex;gap:6px;flex-shrink:0;}
+.items-empty{text-align:center;padding:24px;font-family:'Share Tech Mono',monospace;
+  font-size:11px;letter-spacing:2px;color:var(--dim);}
+
+/* EVENT LIST EXTRAS */
+.event-date-badge{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;
+  background:var(--accent-bg);border:1px solid var(--border);color:var(--accent);
+  padding:2px 8px;flex-shrink:0;white-space:nowrap;}
+.event-type-badge{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1.5px;
+  padding:1px 6px;flex-shrink:0;text-transform:uppercase;}
+
+/* TYPE MANAGER */
+.type-manager{margin-top:8px;}
+.type-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.type-tag{display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;
+  font-size:10px;letter-spacing:1px;padding:3px 8px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--dim);cursor:default;text-transform:uppercase;}
+.type-tag .type-color{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.type-tag .remove-type{background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;
+  margin-left:2px;padding:0;line-height:1;opacity:.6;transition:opacity .2s;}
+.type-tag .remove-type:hover{opacity:1;}
+.type-add-row{display:flex;gap:6px;align-items:center;}
+.type-add-row .fi{flex:1;font-size:11px;padding:5px 8px;}
+.type-add-row input[type="color"]{width:28px;height:28px;border:1px solid var(--border);
+  background:var(--bg);cursor:pointer;padding:2px;}
+.type-add-row .abtn{font-size:10px;padding:5px 12px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);
+  padding:10px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;
+  color:var(--text);z-index:9999;opacity:0;transform:translateY(10px);
+  transition:opacity .25s,transform .25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.success{border-color:var(--green);color:var(--green);}
+.toast.error{border-color:var(--red-border);color:var(--red);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-title">Rekkles</div>
+    <div class="login-sub">admin access</div>
+    <div class="login-err" id="login-err"></div>
+    <div class="fg">
+      <label class="flabel">email</label>
+      <input class="fi" type="email" id="login-email" placeholder="admin@example.com" autocomplete="email">
+    </div>
+    <div class="fg">
+      <label class="flabel">password</label>
+      <input class="fi" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="abtn primary" id="login-btn" style="width:100%;margin-top:6px;">SIGN IN</button>
+  </div>
+</div>
+
+<!-- MAIN PANEL -->
+<div id="admin-panel" class="hidden">
+  <nav>
+    <div class="nav-logo">Rekkles <span>ADMIN</span></div>
+    <div class="nav-right">
+      <a href="index.html" class="nav-btn" target="_blank">VIEW SITE ↗</a>
+      <span class="nav-user" id="nav-user"></span>
+      <button class="nav-btn danger" id="signout-btn">SIGN OUT</button>
+    </div>
+  </nav>
+
+  <div class="admin-wrap">
+
+    <!-- CALENDAR MANAGEMENT -->
+    <div class="asec">
+      <div class="asec-title" id="cal-section-title">Add Event</div>
+      <div class="form-row">
+        <div class="fg">
+          <label class="flabel">date</label>
+          <input class="fi" type="date" id="cal-date">
+        </div>
+        <div class="fg">
+          <label class="flabel">title</label>
+          <input class="fi" type="text" id="cal-title" placeholder="e.g. Solo Queue Grind">
+        </div>
+      </div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="fg">
+          <label class="flabel">start time (optional)</label>
+          <input class="fi" type="time" id="cal-time-start">
+        </div>
+        <div class="fg">
+          <label class="flabel">end time (optional)</label>
+          <input class="fi" type="time" id="cal-time-end">
+        </div>
+        <div class="fg">
+          <label class="flabel">timezone</label>
+          <input class="fi" type="text" id="cal-tz" placeholder="e.g. CET" maxlength="10">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="flabel">type</label>
+        <select class="fs" id="cal-type"></select>
+      </div>
+      <div class="fg">
+        <label class="flabel">description (optional)</label>
+        <textarea class="fta" id="cal-desc" placeholder="Supports multiple lines..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="abtn primary" id="cal-submit-btn">ADD EVENT</button>
+        <button class="abtn secondary hidden" id="cal-cancel-btn">CANCEL</button>
+      </div>
+
+      <div class="items-list" id="cal-list">
+        <div class="items-empty">loading...</div>
+      </div>
+    </div>
+
+    <!-- EVENT TYPES MANAGER -->
+    <div class="asec">
+      <div class="asec-title">Manage Event Types</div>
+      <div class="type-manager">
+        <div class="type-tags" id="type-tags"></div>
+        <div class="type-add-row">
+          <input class="fi" type="text" id="type-new-name" placeholder="new type name">
+          <input type="color" id="type-new-color" value="#E02E41">
+          <button class="abtn primary" id="type-add-btn">ADD</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERIPHERALS MANAGEMENT -->
+    <div class="asec">
+      <div class="asec-title" id="periph-section-title">Add Peripheral</div>
+      <div class="form-row">
+        <div class="fg">
+          <label class="flabel">category</label>
+          <select class="fs" id="periph-category">
+            <option value="Mouse">Mouse</option>
+            <option value="Keyboard">Keyboard</option>
+            <option value="Headset">Headset</option>
+            <option value="Microphone">Microphone</option>
+            <option value="Monitor">Monitor</option>
+            <option value="Webcam">Webcam</option>
+            <option value="Mousepad">Mousepad</option>
+            <option value="Chair">Chair</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="flabel">product name</label>
+          <input class="fi" type="text" id="periph-name" placeholder="e.g. Razer DeathAdder V3">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label class="flabel">image url (optional)</label>
+          <input class="fi" type="text" id="periph-image" placeholder="https://...">
+        </div>
+        <div class="fg">
+          <label class="flabel">product link (optional)</label>
+          <input class="fi" type="text" id="periph-link" placeholder="https://...">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="abtn primary" id="periph-submit-btn">ADD PERIPHERAL</button>
+        <button class="abtn secondary hidden" id="periph-cancel-btn">CANCEL</button>
+      </div>
+
+      <div class="items-list" id="periph-list">
+        <div class="items-empty">loading...</div>
+      </div>
+    </div>
+
+    <!-- SPECS MANAGEMENT -->
+    <div class="asec">
+      <div class="asec-title" id="spec-section-title">Add Spec</div>
+      <div class="form-row">
+        <div class="fg">
+          <label class="flabel">category</label>
+          <select class="fs" id="spec-category">
+            <option value="CPU">CPU</option>
+            <option value="GPU">GPU</option>
+            <option value="RAM">RAM</option>
+            <option value="Motherboard">Motherboard</option>
+            <option value="Storage">Storage</option>
+            <option value="PSU">PSU</option>
+            <option value="Case">Case</option>
+            <option value="Cooling">Cooling</option>
+            <option value="OS">OS</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="flabel">product name</label>
+          <input class="fi" type="text" id="spec-name" placeholder="e.g. NVIDIA RTX 4090">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label class="flabel">image url (optional)</label>
+          <input class="fi" type="text" id="spec-image" placeholder="https://...">
+        </div>
+        <div class="fg">
+          <label class="flabel">product link (optional)</label>
+          <input class="fi" type="text" id="spec-link" placeholder="https://...">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="abtn primary" id="spec-submit-btn">ADD SPEC</button>
+        <button class="abtn secondary hidden" id="spec-cancel-btn">CANCEL</button>
+      </div>
+
+      <div class="items-list" id="spec-list">
+        <div class="items-empty">loading...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let currentUser=null;
+let allEvents=[];
+let allPeripherals=[];
+let allSpecs=[];
+let allTypes=[];  // [{id,name,color}]
+let editingEventId=null;
+let editingPeriphId=null;
+let editingSpecId=null;
+
+const DEFAULT_TYPES=[
+  {name:'stream',color:'#E02E41'},
+  {name:'tournament',color:'#D4A843'},
+  {name:'collab',color:'#60A5FA'},
+  {name:'youtube',color:'#EF4444'},
+  {name:'other',color:'#888888'}
+];
+
+// ─── Firebase wait ────────────────────────────────────────────────────────────
+function onFbReady(cb){if(window._fbReady)cb();else document.addEventListener('fb-ready',cb,{once:true});}
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+onFbReady(()=>{
+  window._onAuth(window._auth,user=>{
+    if(user){
+      currentUser=user;
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('admin-panel').classList.remove('hidden');
+      document.getElementById('nav-user').textContent=user.email;
+      listenTypes();
+      listenCalendar();
+      listenGear();
+    } else {
+      currentUser=null;
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('admin-panel').classList.add('hidden');
+    }
+  });
+});
+
+document.getElementById('login-btn').addEventListener('click',doLogin);
+document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-err');
+  errEl.style.display='none';
+  if(!email||!pass)return;
+  document.getElementById('login-btn').textContent='SIGNING IN...';
+  window._signIn(window._auth,email,pass).catch(err=>{
+    errEl.textContent=err.code==='auth/invalid-credential'?'invalid email or password.':err.message;
+    errEl.style.display='block';
+    document.getElementById('login-btn').textContent='SIGN IN';
+  });
+}
+document.getElementById('signout-btn').addEventListener('click',()=>{
+  window._signOut(window._auth);
+});
+
+// ─── Event Types ─────────────────────────────────────────────────────────────
+function listenTypes(){
+  window._onValue(window._ref(window._db,'rekkles/eventTypes'),snap=>{
+    allTypes=[];
+    if(snap.exists()){
+      snap.forEach(c=>{allTypes.push({id:c.key,...c.val()});});
+    }
+    // Seed defaults if no types exist yet
+    if(!allTypes.length){
+      DEFAULT_TYPES.forEach(t=>{
+        window._push(window._ref(window._db,'rekkles/eventTypes'),t);
+      });
+      return; // onValue will fire again after push
+    }
+    allTypes.sort((a,b)=>a.name.localeCompare(b.name));
+    renderTypeTags();
+    populateTypeSelect();
+  });
+}
+
+function renderTypeTags(){
+  const wrap=document.getElementById('type-tags');
+  wrap.innerHTML=allTypes.map(t=>`
+    <span class="type-tag">
+      <span class="type-color" style="background:${escHtml(t.color)}"></span>
+      ${escHtml(t.name)}
+      <button class="remove-type" data-id="${t.id}" title="remove type">&times;</button>
+    </span>`).join('');
+  wrap.querySelectorAll('.remove-type').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(!confirm(`Remove type "${allTypes.find(t=>t.id===btn.dataset.id)?.name}"?`))return;
+      window._remove(window._ref(window._db,`rekkles/eventTypes/${btn.dataset.id}`));
+      showToast('type removed','success');
+    });
+  });
+}
+
+function populateTypeSelect(){
+  const sel=document.getElementById('cal-type');
+  const prev=sel.value;
+  sel.innerHTML=allTypes.map(t=>`<option value="${escHtml(t.name)}">${escHtml(t.name)}</option>`).join('');
+  if(prev&&allTypes.some(t=>t.name===prev)) sel.value=prev;
+}
+
+function getTypeColor(name){
+  const t=allTypes.find(t=>t.name===name);
+  return t?t.color:'#888888';
+}
+
+document.getElementById('type-add-btn').addEventListener('click',()=>{
+  const nameEl=document.getElementById('type-new-name');
+  const colorEl=document.getElementById('type-new-color');
+  const name=nameEl.value.trim().toLowerCase().replace(/[^a-z0-9 _-]/g,'');
+  if(!name){showToast('type name is required','error');return;}
+  if(allTypes.some(t=>t.name===name)){showToast('type already exists','error');return;}
+  window._push(window._ref(window._db,'rekkles/eventTypes'),{name,color:colorEl.value});
+  nameEl.value='';
+  colorEl.value='#E02E41';
+  showToast('type added','success');
+});
+
+// ─── Calendar CRUD ───────────────────────────────────────────────────────────
+function listenCalendar(){
+  window._onValue(window._ref(window._db,'rekkles/calendar'),snap=>{
+    allEvents=[];
+    if(snap.exists()) snap.forEach(c=>{allEvents.push({id:c.key,...c.val()});});
+    allEvents.sort((a,b)=>a.date.localeCompare(b.date)||((a.timeStart||a.time||'').localeCompare(b.timeStart||b.time||'')));
+    renderCalendarList();
+  });
+}
+
+document.getElementById('cal-submit-btn').addEventListener('click',()=>{
+  const date=document.getElementById('cal-date').value;
+  const timeStart=document.getElementById('cal-time-start').value;
+  const timeEnd=document.getElementById('cal-time-end').value;
+  const tz=document.getElementById('cal-tz').value.trim();
+  const title=document.getElementById('cal-title').value.trim();
+  const type=document.getElementById('cal-type').value;
+  const desc=document.getElementById('cal-desc').value.trim();
+  if(!date||!title){showToast('date and title are required','error');return;}
+  const data={date,timeStart:timeStart||'',timeEnd:timeEnd||'',tz:tz||'',title,type,description:desc};
+  if(editingEventId){
+    window._update(window._ref(window._db,`rekkles/calendar/${editingEventId}`),data);
+    showToast('event updated','success');
+    cancelEditEvent();
+  } else {
+    data.timestamp=Date.now();
+    window._push(window._ref(window._db,'rekkles/calendar'),data);
+    showToast('event added','success');
+    clearCalForm();
+  }
+});
+
+document.getElementById('cal-cancel-btn').addEventListener('click',cancelEditEvent);
+
+function clearCalForm(){
+  document.getElementById('cal-date').value='';
+  document.getElementById('cal-time-start').value='';
+  document.getElementById('cal-time-end').value='';
+  document.getElementById('cal-tz').value='';
+  document.getElementById('cal-title').value='';
+  const sel=document.getElementById('cal-type');
+  if(sel.options.length) sel.selectedIndex=0;
+  document.getElementById('cal-desc').value='';
+}
+
+function cancelEditEvent(){
+  editingEventId=null;
+  clearCalForm();
+  document.getElementById('cal-section-title').textContent='Add Event';
+  document.getElementById('cal-submit-btn').textContent='ADD EVENT';
+  document.getElementById('cal-cancel-btn').classList.add('hidden');
+}
+
+function startEditEvent(ev){
+  editingEventId=ev.id;
+  document.getElementById('cal-date').value=ev.date;
+  document.getElementById('cal-time-start').value=ev.timeStart||ev.time||'';
+  document.getElementById('cal-time-end').value=ev.timeEnd||'';
+  document.getElementById('cal-tz').value=ev.tz||'';
+  document.getElementById('cal-title').value=ev.title;
+  document.getElementById('cal-type').value=ev.type||'';
+  document.getElementById('cal-desc').value=ev.description||'';
+  document.getElementById('cal-section-title').textContent='Edit Event';
+  document.getElementById('cal-submit-btn').textContent='UPDATE EVENT';
+  document.getElementById('cal-cancel-btn').classList.remove('hidden');
+  document.getElementById('cal-date').focus();
+}
+
+function fmtTime(ev){
+  const s=ev.timeStart||ev.time||'';
+  const e=ev.timeEnd||'';
+  const tz=ev.tz||'';
+  if(!s)return '';
+  let t=e?`${s}-${e}`:s;
+  if(tz) t+=` ${tz}`;
+  return t;
+}
+
+function renderCalendarList(){
+  const list=document.getElementById('cal-list');
+  list.innerHTML='';
+  if(!allEvents.length){list.innerHTML='<div class="items-empty">no events yet.</div>';return;}
+  allEvents.forEach(ev=>{
+    const row=document.createElement('div');
+    row.className='item-row';
+    const timeStr=fmtTime(ev);
+    const typeColor=getTypeColor(ev.type);
+    row.innerHTML=`
+      <span class="event-date-badge">${ev.date}${timeStr?' '+timeStr:''}</span>
+      <div class="item-info">
+        <div class="item-name">${escHtml(ev.title)}</div>
+        ${ev.description?`<div class="item-meta">${escHtml(ev.description).replace(/\n/g,' · ')}</div>`:''}
+      </div>
+      <span class="event-type-badge" style="background:${typeColor}22;color:${typeColor}">${escHtml(ev.type||'other')}</span>
+      <div class="item-actions">
+        <button class="abtn secondary edit-btn" style="font-size:11px;padding:5px 12px;">EDIT</button>
+        <button class="abtn danger delete-btn">DELETE</button>
+      </div>`;
+    row.querySelector('.edit-btn').addEventListener('click',()=>startEditEvent(ev));
+    row.querySelector('.delete-btn').addEventListener('click',()=>{
+      if(!confirm('Delete this event?'))return;
+      window._remove(window._ref(window._db,`rekkles/calendar/${ev.id}`));
+      showToast('event deleted','success');
+      if(editingEventId===ev.id)cancelEditEvent();
+    });
+    list.appendChild(row);
+  });
+}
+
+// ─── Gear CRUD (Peripherals + Specs) ─────────────────────────────────────────
+function listenGear(){
+  window._onValue(window._ref(window._db,'rekkles/gear/peripherals'),snap=>{
+    allPeripherals=[];
+    if(snap.exists()) snap.forEach(c=>{allPeripherals.push({id:c.key,...c.val()});});
+    allPeripherals.sort((a,b)=>(a.order??99999)-(b.order??99999));
+    renderGearList('periph',allPeripherals);
+  });
+  window._onValue(window._ref(window._db,'rekkles/gear/specs'),snap=>{
+    allSpecs=[];
+    if(snap.exists()) snap.forEach(c=>{allSpecs.push({id:c.key,...c.val()});});
+    allSpecs.sort((a,b)=>(a.order??99999)-(b.order??99999));
+    renderGearList('spec',allSpecs);
+  });
+}
+
+// Peripheral submit
+document.getElementById('periph-submit-btn').addEventListener('click',()=>{
+  submitGearItem('periph','rekkles/gear/peripherals',allPeripherals);
+});
+document.getElementById('periph-cancel-btn').addEventListener('click',()=>cancelEditGear('periph'));
+
+// Spec submit
+document.getElementById('spec-submit-btn').addEventListener('click',()=>{
+  submitGearItem('spec','rekkles/gear/specs',allSpecs);
+});
+document.getElementById('spec-cancel-btn').addEventListener('click',()=>cancelEditGear('spec'));
+
+function submitGearItem(prefix,dbPath,items){
+  const category=document.getElementById(`${prefix}-category`).value;
+  const name=document.getElementById(`${prefix}-name`).value.trim();
+  const imageUrl=document.getElementById(`${prefix}-image`).value.trim();
+  const link=document.getElementById(`${prefix}-link`).value.trim();
+  if(!name){showToast('product name is required','error');return;}
+
+  const editId=prefix==='periph'?editingPeriphId:editingSpecId;
+  const data={category,name,imageUrl:imageUrl||'',link:link||''};
+
+  if(editId){
+    window._update(window._ref(window._db,`${dbPath}/${editId}`),data);
+    showToast(`${prefix==='periph'?'peripheral':'spec'} updated`,'success');
+    cancelEditGear(prefix);
+  } else {
+    data.order=items.length;
+    data.timestamp=Date.now();
+    window._push(window._ref(window._db,dbPath),data);
+    showToast(`${prefix==='periph'?'peripheral':'spec'} added`,'success');
+    clearGearForm(prefix);
+  }
+}
+
+function clearGearForm(prefix){
+  document.getElementById(`${prefix}-category`).selectedIndex=0;
+  document.getElementById(`${prefix}-name`).value='';
+  document.getElementById(`${prefix}-image`).value='';
+  document.getElementById(`${prefix}-link`).value='';
+}
+
+function cancelEditGear(prefix){
+  if(prefix==='periph')editingPeriphId=null;
+  else editingSpecId=null;
+  clearGearForm(prefix);
+  const label=prefix==='periph'?'Peripheral':'Spec';
+  document.getElementById(`${prefix}-section-title`).textContent=`Add ${label}`;
+  document.getElementById(`${prefix}-submit-btn`).textContent=`ADD ${label.toUpperCase()}`;
+  document.getElementById(`${prefix}-cancel-btn`).classList.add('hidden');
+}
+
+function startEditGear(prefix,item){
+  if(prefix==='periph')editingPeriphId=item.id;
+  else editingSpecId=item.id;
+  document.getElementById(`${prefix}-category`).value=item.category;
+  document.getElementById(`${prefix}-name`).value=item.name;
+  document.getElementById(`${prefix}-image`).value=item.imageUrl||'';
+  document.getElementById(`${prefix}-link`).value=item.link||'';
+  const label=prefix==='periph'?'Peripheral':'Spec';
+  document.getElementById(`${prefix}-section-title`).textContent=`Edit ${label}`;
+  document.getElementById(`${prefix}-submit-btn`).textContent=`UPDATE ${label.toUpperCase()}`;
+  document.getElementById(`${prefix}-cancel-btn`).classList.remove('hidden');
+  document.getElementById(`${prefix}-name`).focus();
+}
+
+function renderGearList(prefix,items){
+  const dbPath=prefix==='periph'?'rekkles/gear/peripherals':'rekkles/gear/specs';
+  const list=document.getElementById(`${prefix}-list`);
+  list.innerHTML='';
+  if(!items.length){
+    list.innerHTML=`<div class="items-empty">no ${prefix==='periph'?'peripherals':'specs'} yet.</div>`;
+    return;
+  }
+  items.forEach(item=>{
+    const row=document.createElement('div');
+    row.className='item-row';
+    row.innerHTML=`
+      <div class="item-info">
+        <div class="item-category">${escHtml(item.category)}</div>
+        <div class="item-name">${escHtml(item.name)}</div>
+        ${item.link?`<div class="item-meta">${escHtml(item.link)}</div>`:''}
+      </div>
+      <div class="item-actions">
+        <button class="abtn secondary edit-btn" style="font-size:11px;padding:5px 12px;">EDIT</button>
+        <button class="abtn danger delete-btn">DELETE</button>
+      </div>`;
+    row.querySelector('.edit-btn').addEventListener('click',()=>startEditGear(prefix,item));
+    row.querySelector('.delete-btn').addEventListener('click',()=>{
+      if(!confirm(`Delete ${item.name}?`))return;
+      window._remove(window._ref(window._db,`${dbPath}/${item.id}`));
+      showToast('item deleted','success');
+      const editId=prefix==='periph'?editingPeriphId:editingSpecId;
+      if(editId===item.id)cancelEditGear(prefix);
+    });
+    list.appendChild(row);
+  });
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast'+(type?' '+type:'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>

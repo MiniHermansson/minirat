@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rekkles</title>
+<link rel="icon" href="/los-ratones-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+:root{
+  --accent:#E02E41;--accent-dim:rgba(224,46,65,0.55);--accent-bg:rgba(224,46,65,0.12);
+  --bg:#0A0A0A;--surface:#141414;--surface2:#1C1C1C;
+  --border:rgba(224,46,65,0.25);--text:#EDEDED;--dim:rgba(237,237,237,0.50);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 70% 30% at 50% 0%,rgba(224,46,65,0.08) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 80% at 0% 50%,rgba(224,46,65,0.04) 0%,transparent 55%),
+    radial-gradient(ellipse 30% 80% at 100% 50%,rgba(224,46,65,0.04) 0%,transparent 55%);}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24px;
+  border-bottom:1px solid var(--border);background:rgba(10,10,10,0.97);backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:200;}
+.nav-brand{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:4px;color:var(--accent);text-decoration:none;}
+.nav-links{display:flex;align-items:center;gap:16px;}
+.nav-links a{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:1.5px;
+  color:var(--dim);text-decoration:none;text-transform:uppercase;padding:4px 0;
+  border-bottom:1px solid transparent;transition:all .2s;}
+.nav-links a:hover{color:var(--text);}
+.nav-links a.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* HERO */
+.hero{position:relative;width:100%;min-height:60vh;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;background:var(--surface);border-bottom:1px solid var(--border);}
+.hero-bg{position:absolute;inset:0;z-index:0;
+  background:url('hero-bg.jpeg') center center/cover no-repeat;}
+.hero-bg::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(to top,var(--bg) 0%,rgba(10,10,10,0.4) 40%,rgba(10,10,10,0.2) 100%);}
+.hero-content{position:relative;z-index:1;text-align:center;padding:40px 20px;}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:72px;letter-spacing:12px;color:var(--text);
+  line-height:1;margin-bottom:8px;text-shadow:0 2px 20px rgba(0,0,0,0.6);}
+.hero-accent{display:block;width:60px;height:3px;background:var(--accent);margin:16px auto;}
+.hero-sub{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:3px;color:rgba(237,237,237,0.75);
+  text-transform:uppercase;text-shadow:0 1px 8px rgba(0,0,0,0.5);}
+
+/* SOCIALS */
+.socials-section{display:flex;flex-direction:column;align-items:center;padding:48px 20px 60px;
+  position:relative;z-index:1;}
+.socials-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:var(--accent);
+  margin-bottom:20px;}
+.socials-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+.social-link{display:flex;align-items:center;justify-content:center;width:48px;height:48px;
+  border:1px solid var(--border);color:var(--dim);font-size:18px;text-decoration:none;
+  transition:all .25s;}
+.social-link:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-bg);
+  transform:translateY(-2px);}
+
+/* FOOTER */
+.footer{text-align:center;padding:20px;border-top:1px solid rgba(224,46,65,0.1);
+  position:relative;z-index:1;}
+.footer-text{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);}
+
+@media(max-width:540px){
+  .hero-title{font-size:48px;letter-spacing:8px;}
+  .hero{min-height:45vh;}
+  .social-link{width:42px;height:42px;font-size:16px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-brand">Rekkles</a>
+  <div class="nav-links">
+    <a href="index.html" class="active">Home</a>
+    <a href="calendar.html">Calendar</a>
+    <a href="specs.html">Specs</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-title">REKKLES</div>
+    <span class="hero-accent"></span>
+    <div class="hero-sub">streamer &middot; content creator</div>
+  </div>
+</div>
+
+<div class="socials-section">
+  <div class="socials-title">Follow</div>
+  <div class="socials-row">
+    <a href="https://www.twitch.tv/rekkles" target="_blank" rel="noopener" class="social-link" title="Twitch"><i class="fa-brands fa-twitch"></i></a>
+    <a href="https://twitter.com/RekklesLoL" target="_blank" rel="noopener" class="social-link" title="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+    <a href="https://www.youtube.com/Rekkles" target="_blank" rel="noopener" class="social-link" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+    <a href="https://www.instagram.com/Rekkles" target="_blank" rel="noopener" class="social-link" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+    <a href="https://www.facebook.com/RekklesLoL" target="_blank" rel="noopener" class="social-link" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+    <a href="https://discord.gg/SUY2KQ27uK" target="_blank" rel="noopener" class="social-link" title="Discord"><i class="fa-brands fa-discord"></i></a>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-text">minirat.xyz</div>
+</div>
+
+</body>
+</html>

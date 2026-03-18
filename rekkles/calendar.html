@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rekkles — Schedule</title>
+<link rel="icon" href="/los-ratones-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<!-- Firebase -->
+<script type="module">
+  import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import{getDatabase,ref,onValue}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const cfg={apiKey:"AIzaSyCHx89HHT-nHlP7kcNCTT21-2S7jvI9G-c",authDomain:"miniratxyz.firebaseapp.com",
+    databaseURL:"https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:"miniratxyz",storageBucket:"miniratxyz.firebasestorage.app",
+    messagingSenderId:"524360710142",appId:"1:524360710142:web:a99846767a02914a35b2af"};
+  const app=initializeApp(cfg);
+  const db=getDatabase(app);
+
+  let allEvents=[];
+  let typeColors={};  // {name: color} from Firebase
+  let currentYear,currentMonth;
+
+  const now=new Date();
+  currentYear=now.getFullYear();
+  currentMonth=now.getMonth();
+
+  // Load dynamic type colors
+  onValue(ref(db,'rekkles/eventTypes'),snap=>{
+    typeColors={};
+    if(snap.exists()) snap.forEach(c=>{const v=c.val();typeColors[v.name]=v.color;});
+    renderCalendar();
+    renderUpcoming();
+  });
+
+  onValue(ref(db,'rekkles/calendar'),snap=>{
+    allEvents=[];
+    if(snap.exists()) snap.forEach(c=>{allEvents.push({id:c.key,...c.val()});});
+    renderCalendar();
+    renderUpcoming();
+  });
+
+  window._calPrev=()=>{currentMonth--;if(currentMonth<0){currentMonth=11;currentYear--;}renderCalendar();};
+  window._calNext=()=>{currentMonth++;if(currentMonth>11){currentMonth=0;currentYear++;}renderCalendar();};
+
+  function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function getColor(type){return typeColors[type]||'#888888';}
+  function fmtTime(ev){
+    const s=ev.timeStart||ev.time||'';
+    const e=ev.timeEnd||'';
+    const tz=ev.tz||'';
+    if(!s)return '';
+    let t=e?`${s}-${e}`:s;
+    if(tz) t+=` ${tz}`;
+    return t;
+  }
+
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+
+  function renderCalendar(){
+    const grid=document.getElementById('cal-grid');
+    const label=document.getElementById('cal-month-label');
+    label.textContent=`${MONTHS[currentMonth]} ${currentYear}`;
+
+    const firstDay=new Date(currentYear,currentMonth,1).getDay();
+    const daysInMonth=new Date(currentYear,currentMonth+1,0).getDate();
+    const startOffset=(firstDay===0?6:firstDay-1);
+
+    const today=new Date();
+    const isCurrentMonth=today.getFullYear()===currentYear&&today.getMonth()===currentMonth;
+    const todayDate=today.getDate();
+
+    const prefix=`${currentYear}-${String(currentMonth+1).padStart(2,'0')}`;
+    const monthEvents=allEvents.filter(e=>e.date&&e.date.startsWith(prefix));
+    const eventsByDay={};
+    monthEvents.forEach(e=>{
+      const day=parseInt(e.date.split('-')[2],10);
+      if(!eventsByDay[day])eventsByDay[day]=[];
+      eventsByDay[day].push(e);
+    });
+    Object.values(eventsByDay).forEach(arr=>arr.sort((a,b)=>(a.timeStart||a.time||'').localeCompare(b.timeStart||b.time||'')));
+
+    let html='';
+    DAYS.forEach(d=>{html+=`<div class="cal-header">${d}</div>`;});
+    for(let i=0;i<startOffset;i++){html+=`<div class="cal-cell cal-cell-empty"></div>`;}
+    for(let d=1;d<=daysInMonth;d++){
+      const isToday=isCurrentMonth&&d===todayDate;
+      const dayEvents=eventsByDay[d]||[];
+      const timeLabel=e=>{const t=e.timeStart||e.time||'';return t?`<span class="cal-event-time">${escHtml(t)}</span>`:'';}
+      html+=`<div class="cal-cell${isToday?' cal-today':''}">
+        <div class="cal-day-num">${d}</div>
+        <div class="cal-events">
+          ${dayEvents.map(e=>`<div class="cal-event" style="--ev-color:${getColor(e.type)}" onclick="window._showEvent('${e.id}')">
+            ${timeLabel(e)}
+            <span class="cal-event-title">${escHtml(e.title)}</span>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }
+    grid.innerHTML=html;
+  }
+
+  function renderUpcoming(){
+    const wrap=document.getElementById('upcoming-list');
+    const today=new Date().toISOString().slice(0,10);
+    const upcoming=allEvents.filter(e=>e.date>=today)
+      .sort((a,b)=>a.date.localeCompare(b.date)||((a.timeStart||a.time||'').localeCompare(b.timeStart||b.time||'')))
+      .slice(0,8);
+    if(!upcoming.length){wrap.innerHTML='<div class="empty">no upcoming events.</div>';return;}
+    wrap.innerHTML=upcoming.map(e=>{
+      const t=fmtTime(e);
+      return `<div class="upcoming-row" onclick="window._showEvent('${e.id}')">
+        <div class="upcoming-date">${formatDate(e.date)}${t?' '+t:''}</div>
+        <div class="upcoming-title">${escHtml(e.title)}</div>
+        <span class="upcoming-type" style="--ev-color:${getColor(e.type)}">${escHtml(e.type||'other')}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function formatDate(iso){
+    const d=new Date(iso+'T00:00:00');
+    return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  }
+
+  window._showEvent=function(id){
+    const ev=allEvents.find(e=>e.id===id);
+    if(!ev)return;
+    const modal=document.getElementById('event-modal');
+    const t=fmtTime(ev);
+    document.getElementById('modal-title').textContent=ev.title;
+    document.getElementById('modal-date').textContent=formatDate(ev.date)+(t?' at '+t:'');
+    document.getElementById('modal-type').textContent=ev.type||'other';
+    document.getElementById('modal-type').style.setProperty('--ev-color',getColor(ev.type));
+    const descEl=document.getElementById('modal-desc');
+    descEl.innerHTML=ev.description?escHtml(ev.description).replace(/\n/g,'<br>'):'';
+    descEl.style.display=ev.description?'block':'none';
+    modal.classList.remove('hidden');
+  };
+  window._closeModal=function(){document.getElementById('event-modal').classList.add('hidden');};
+</script>
+<style>
+:root{
+  --accent:#E02E41;--accent-dim:rgba(224,46,65,0.55);--accent-bg:rgba(224,46,65,0.12);
+  --bg:#0A0A0A;--surface:#141414;--surface2:#1C1C1C;
+  --border:rgba(224,46,65,0.25);--text:#EDEDED;--dim:rgba(237,237,237,0.50);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 70% 30% at 50% 0%,rgba(224,46,65,0.08) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 80% at 0% 50%,rgba(224,46,65,0.04) 0%,transparent 55%),
+    radial-gradient(ellipse 30% 80% at 100% 50%,rgba(224,46,65,0.04) 0%,transparent 55%);}
+.hidden{display:none!important;}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24px;
+  border-bottom:1px solid var(--border);background:rgba(10,10,10,0.97);backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:200;}
+.nav-brand{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:4px;color:var(--accent);text-decoration:none;}
+.nav-links{display:flex;align-items:center;gap:16px;}
+.nav-links a{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:1.5px;
+  color:var(--dim);text-decoration:none;text-transform:uppercase;padding:4px 0;
+  border-bottom:1px solid transparent;transition:all .2s;}
+.nav-links a:hover{color:var(--text);}
+.nav-links a.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* PAGE */
+.page-wrap{max-width:960px;margin:0 auto;padding:40px 20px 80px;position:relative;z-index:1;}
+
+/* CALENDAR HEADER */
+.cal-nav{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:24px;}
+.cal-month-label{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:6px;color:var(--text);
+  min-width:280px;text-align:center;}
+.cal-nav-btn{background:none;border:1px solid var(--border);color:var(--accent);width:36px;height:36px;
+  cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.cal-nav-btn:hover{background:var(--accent-bg);border-color:var(--accent);}
+
+/* CALENDAR GRID */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-header{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent-dim);
+  text-align:center;padding:8px 4px;}
+.cal-cell{background:var(--surface);border:1px solid rgba(224,46,65,0.1);min-height:90px;padding:6px;
+  transition:border-color .2s;}
+.cal-cell:hover{border-color:var(--border);}
+.cal-cell-empty{background:transparent;border-color:transparent;}
+.cal-today{border-color:var(--accent)!important;box-shadow:inset 0 0 0 1px var(--accent);}
+.cal-day-num{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);margin-bottom:4px;}
+.cal-today .cal-day-num{color:var(--accent);font-weight:bold;}
+.cal-events{display:flex;flex-direction:column;gap:2px;}
+.cal-event{background:color-mix(in srgb,var(--ev-color) 15%,transparent);border-left:2px solid var(--ev-color);
+  padding:2px 5px;cursor:pointer;transition:background .15s;overflow:hidden;}
+.cal-event:hover{background:color-mix(in srgb,var(--ev-color) 25%,transparent);}
+.cal-event-time{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);margin-right:4px;}
+.cal-event-title{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* UPCOMING */
+.upcoming-section{margin-top:40px;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:var(--accent);
+  margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.upcoming-list{display:flex;flex-direction:column;gap:4px;}
+.upcoming-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);
+  border:1px solid rgba(224,46,65,0.1);cursor:pointer;transition:border-color .2s;}
+.upcoming-row:hover{border-color:var(--border);}
+.upcoming-date{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--dim);
+  width:110px;flex-shrink:0;}
+.upcoming-title{font-size:14px;font-weight:600;color:var(--text);flex:1;}
+.upcoming-type{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--ev-color);flex-shrink:0;}
+
+/* EVENT MODAL */
+.event-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+.event-modal{background:var(--surface);border:1px solid var(--border);padding:24px;
+  max-width:420px;width:100%;display:flex;flex-direction:column;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--text);}
+.modal-date{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--dim);margin-top:4px;}
+.modal-type{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--ev-color);margin-top:8px;
+  background:color-mix(in srgb,var(--ev-color) 15%,transparent);padding:2px 8px;}
+.modal-desc{font-size:13px;color:var(--text);margin-top:12px;line-height:1.6;opacity:.85;}
+.modal-close{background:none;border:1px solid var(--border);color:var(--dim);font-family:'Rajdhani',sans-serif;
+  font-size:10px;letter-spacing:1.5px;padding:4px 14px;cursor:pointer;margin-top:16px;transition:all .2s;
+  align-self:flex-end;}
+.modal-close:hover{border-color:var(--text);color:var(--text);}
+
+/* EMPTY */
+.empty{text-align:center;padding:30px;font-family:'Share Tech Mono',monospace;
+  font-size:11px;letter-spacing:2px;color:var(--dim);}
+
+/* MOBILE */
+@media(max-width:700px){
+  .cal-month-label{font-size:24px;min-width:200px;}
+  .cal-cell{min-height:70px;padding:4px;}
+  .cal-event-time{display:none;}
+  .cal-event-title{font-size:10px;}
+}
+@media(max-width:540px){
+  .cal-grid-desktop{display:none;}
+  .cal-mobile{display:block!important;}
+  .upcoming-date{width:90px;font-size:10px;}
+}
+@media(min-width:541px){
+  .cal-mobile{display:none!important;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-brand">Rekkles</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="calendar.html" class="active">Calendar</a>
+    <a href="specs.html">Specs</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="cal-nav">
+    <button class="cal-nav-btn" onclick="window._calPrev()"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="cal-month-label" id="cal-month-label">Loading...</div>
+    <button class="cal-nav-btn" onclick="window._calNext()"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+
+  <div class="cal-grid-desktop">
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+
+  <div class="upcoming-section">
+    <div class="section-title">Upcoming</div>
+    <div class="upcoming-list" id="upcoming-list">
+      <div class="empty">loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT DETAIL MODAL -->
+<div class="event-modal-overlay hidden" id="event-modal" onclick="if(event.target===this)window._closeModal()">
+  <div class="event-modal">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-date" id="modal-date"></div>
+    <div class="modal-type" id="modal-type"></div>
+    <div class="modal-desc" id="modal-desc"></div>
+    <button class="modal-close" onclick="window._closeModal()">CLOSE</button>
+  </div>
+</div>
+
+</body>
+</html>

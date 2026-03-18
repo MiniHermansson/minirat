@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fearless Draft — Alt Theme</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=Bungee+Inline&display=swap" rel="stylesheet">
 <script>document.documentElement.setAttribute('data-theme',localStorage.getItem('fearless-theme')||'dark');</script>
 <style>
 :root {
@@ -27,7 +27,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
 .nav-btn{background:none;border:1px solid var(--border);color:var(--text);font-family:'Rajdhani',sans-serif;
   font-size:12px;letter-spacing:1.5px;padding:5px 16px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
 .nav-btn:hover{border-color:var(--gold);color:var(--gold);}
-.series-header{display:flex;align-items:center;justify-content:center;gap:18px;padding:14px 24px 28px;}
+.series-header{display:flex;align-items:center;justify-content:center;gap:18px;padding:14px 24px 20px;}
 .team-hero{font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,3vw,38px);letter-spacing:3px;min-width:130px;color:#d8c9ff;}
 .team-hero.t1{text-align:right;}
 .team-hero.t2{text-align:left;}
@@ -43,33 +43,31 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
   background:var(--surface2);border:1px solid var(--border);border-bottom:none;align-self:center;
   font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:var(--gold);
   cursor:pointer;user-select:none;transition:background .15s;}
-.game-lbl:hover{background:rgba(212,168,67,0.1);}
+.game-lbl:hover{background:var(--gold-bg);}
 .game-lbl .collapse-arrow{font-size:9px;color:var(--gold-dim);transition:transform .25s;}
 .game-lbl.collapsed .collapse-arrow{transform:rotate(-90deg);}
-.game-header{display:grid;grid-template-columns:1fr 6px 1fr;border:1px solid var(--border);border-bottom:none;}
+.game-header{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);border-bottom:none;}
 .game-header-team{display:flex;align-items:center;justify-content:center;padding:4px 14px;
   font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;}
-.game-header-team.blue{color:var(--blue);background:var(--blue-bg);}
+.game-header-team.blue{color:var(--blue);background:var(--blue-bg);border-right:1px solid var(--border);}
 .game-header-team.red{color:var(--red);background:var(--red-bg);}
-.game-header-mid{background:var(--surface2);border-left:1px solid var(--border);border-right:1px solid var(--border);}
 .game-footer{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:5px 14px;
   border:1px solid var(--border);border-top:none;align-self:center;
   font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;}
 .game-footer.tbd{background:var(--surface2);color:rgba(208,208,224,0.65);}
 .game-footer.won{background:rgba(26,186,145,0.18);border-color:rgba(26,186,145,0.6);color:var(--gold);}
-.game-row{display:grid;grid-template-columns:1fr 6px 1fr;background:var(--surface);border:1px solid var(--border);min-height:80px;}
-.game-divider{background:var(--surface2);border-left:1px solid var(--border);border-right:1px solid var(--border);}
+.game-row{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--border);min-height:80px;position:relative;}
 .team-col{display:flex;flex-direction:column;justify-content:flex-start;padding:8px 12px;gap:5px;}
-.team-col.t1{background:var(--blue-bg);}
+.team-col.t1{background:var(--blue-bg);border-right:1px solid var(--border);}
 .team-col.t2{background:var(--red-bg);}
 .tc-picks{display:flex;gap:6px;align-items:flex-start;justify-content:center;}
 .pick-slot{display:flex;flex-direction:column;align-items:center;gap:2px;width:52px;}
 .pick-slot-name{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;color:rgba(210,210,228,0.9);
   text-align:center;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;height:13px;}
 .pick-slot-role{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:1.5px;
-  color:rgba(216,201,255,0.65);text-transform:uppercase;text-align:center;height:10px;}
+  color:rgba(216,201,255,0.65);text-transform:uppercase;text-align:center;height:10px;margin-top:4px;}
 .pick-slot-empty .ci-img-wrap{opacity:0.15;}
-.tc-bans{display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin-top:5px;}
+.tc-bans{display:flex;flex-wrap:wrap;gap:3px;align-items:center;justify-content:center;margin-top:5px;}
 .tc-bans-lbl{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(26,186,145,0.65);margin-right:3px;flex-shrink:0;}
 .ci{position:relative;width:44px;height:44px;border:1px solid rgba(255,255,255,0.15);overflow:visible;flex-shrink:0;}
 .ci-img-wrap{width:44px;height:44px;overflow:hidden;position:relative;}
@@ -89,12 +87,13 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
 .grave-title{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;color:var(--gold);white-space:nowrap;}
 .grave-line{flex:1;height:1px;background:linear-gradient(to right,var(--gold-dim),transparent);}
 .grave-count{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gold);}
-.grave-role-row{display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:12px;}
-.grave-role-lbl{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:3px;color:rgba(216,201,255,0.75);
-  text-align:center;padding-bottom:4px;width:100%;max-width:600px;border:none;
-  background-image:linear-gradient(to right,transparent,rgba(216,201,255,0.3) 20%,rgba(216,201,255,0.3) 80%,transparent);
-  background-size:100% 1px;background-repeat:no-repeat;background-position:bottom;}
-.grave-chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;}
+.grave-body-row{display:flex;flex-direction:row;gap:56px;flex-wrap:wrap;justify-content:center;}
+.grave-role-row{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.grave-role-icon{width:20px;height:20px;color:rgba(216,201,255,0.85);opacity:0.8;}
+.grave-role-icon svg{width:100%;height:100%;}
+.grave-chips{display:grid;gap:3px;position:relative;}
+.grave-role-row:not(:last-child) .grave-chips::after{content:'';position:absolute;right:-28px;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,transparent,rgba(216,201,255,0.35) 25%,rgba(216,201,255,0.35) 75%,transparent);}
 .gchip{position:relative;width:32px;height:32px;overflow:visible;cursor:default;flex-shrink:0;}
 .gchip img{width:32px;height:32px;object-fit:cover;object-position:top center;display:block;
   filter:grayscale(0.2) brightness(0.9);border:1px solid rgba(216,201,255,0.12);transition:filter .15s,border-color .15s;}
@@ -130,19 +129,13 @@ html[data-theme="light"] .tc-bans-lbl{color:#13A882;}
 html[data-theme="light"] .ci .ctip,
 html[data-theme="light"] .gchip .gtip{background:#FFFFFF;color:#0F9070;border-color:rgba(10,140,100,0.25);}
 html[data-theme="light"] .gchip img{border-color:rgba(0,0,0,0.15);}
-html[data-theme="light"] .grave-role-lbl{color:#13A882;
-  background-image:linear-gradient(to right,transparent,rgba(10,140,100,0.25) 20%,rgba(10,140,100,0.25) 80%,transparent);}
+html[data-theme="light"] .grave-role-icon{color:rgba(100,80,180,0.75);}
 html[data-theme="light"] #toast{color:var(--text);}
 html[data-theme="light"] .game-lbl{background:var(--surface2);}
 html[data-theme="light"] .game-footer.won{background:rgba(122,94,10,0.15);border-color:rgba(122,94,10,0.5);}
 .theme-btn{background:none;border:1px solid var(--border);color:var(--gold);font-size:14px;
   width:30px;height:30px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;padding:0;}
 .theme-btn:hover{border-color:var(--gold);background:var(--gold-bg);}
-.game-lbl{color:#D4A843;}
-.game-lbl .collapse-arrow{color:rgba(212,168,67,0.6);}
-.game-footer.won{color:#D4A843;}
-html[data-theme="light"] .game-lbl{color:#B89200;}
-html[data-theme="light"] .game-footer.won{color:#B89200;}
 </style>
 </head>
 <body>
@@ -211,6 +204,13 @@ function teamName(s){return s==='t1'?S.team1:S.team2;}
 
 const ROLE_ORDER=['Top','Jungle','Mid','Bot','Support'];
 const ROLE_SHORT={Top:'TOP',Jungle:'JGL',Mid:'MID',Bot:'BOT',Support:'SUP'};
+const ROLE_SVG={
+  Top:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><path opacity="0.3" fill="currentColor" fill-rule="evenodd" d="M21,14H14v7h7V14Zm5-3V26L11.014,26l-4,4H30V7.016Z"/><polygon fill="currentColor" points="4 4 4.003 28.045 9 23 9 9 23 9 28.045 4.003 4 4"/></svg>`,
+  Jungle:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><path fill="currentColor" fill-rule="evenodd" d="M25,3c-2.128,3.3-5.147,6.851-6.966,11.469A42.373,42.373,0,0,1,20,20a27.7,27.7,0,0,1,1-3C21,12.023,22.856,8.277,25,3ZM13,20c-1.488-4.487-4.76-6.966-9-9,3.868,3.136,4.422,7.52,5,12l3.743,3.312C14.215,27.917,16.527,30.451,17,31c4.555-9.445-3.366-20.8-8-28C11.67,9.573,13.717,13.342,13,20Zm8,5a15.271,15.271,0,0,1,0,2l4-4c0.578-4.48,1.132-8.864,5-12C24.712,13.537,22.134,18.854,21,25Z"/></svg>`,
+  Mid:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><path opacity="0.3" fill="currentColor" fill-rule="evenodd" d="M30,12.968l-4.008,4L26,26H17l-4,4H30ZM16.979,8L21,4H4V20.977L8,17,8,8h8.981Z"/><polygon fill="currentColor" points="25 4 4 25 4 30 9 30 30 9 30 4 25 4"/></svg>`,
+  Bot:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><path opacity="0.3" fill="currentColor" fill-rule="evenodd" d="M13,20h7V13H13v7ZM4,4V26.984l3.955-4L8,8,22.986,8l4-4H4Z"/><polygon fill="currentColor" points="29.997 5.955 25 11 25 25 11 25 5.955 29.997 30 30 29.997 5.955"/></svg>`,
+  Support:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><path fill="currentColor" fill-rule="evenodd" d="M26,13c3.535,0,8-4,8-4H23l-3,3,2,7,5-2-3-4h2ZM22,5L20.827,3H13.062L12,5l5,6Zm-5,9-1-1L13,28l4,3,4-3L18,13ZM11,9H0s4.465,4,8,4h2L7,17l5,2,2-7Z"/></svg>`
+};
 
 function renderDisplay(){
   document.getElementById('d-t1').textContent=S.team1;
@@ -249,9 +249,8 @@ function buildGameBlock(g,gi){
   // header
   const hdr=document.createElement('div'); hdr.className='game-header';
   const bh=document.createElement('div'); bh.className='game-header-team blue'; bh.textContent=blueName;
-  const mh=document.createElement('div'); mh.className='game-header-mid';
   const rh=document.createElement('div'); rh.className='game-header-team red'; rh.textContent=redName;
-  hdr.appendChild(bh); hdr.appendChild(mh); hdr.appendChild(rh);
+  hdr.appendChild(bh); hdr.appendChild(rh);
   body.appendChild(hdr);
 
   // row
@@ -259,13 +258,12 @@ function buildGameBlock(g,gi){
   const bc=document.createElement('div'); bc.className='team-col t1';
   const bp=document.createElement('div'); bp.className='tc-picks';
   buildRoleSlots(bluePicks,bp); bc.appendChild(bp);
-  if(blueBans.length){const br=document.createElement('div');br.className='tc-bans';const l=document.createElement('span');l.className='tc-bans-lbl';l.textContent='BANS';br.appendChild(l);blueBans.forEach(b=>br.appendChild(makeCI(b.champion,true,'',true)));bc.appendChild(br);}
-  const div=document.createElement('div'); div.className='game-divider';
+  if(blueBans.length){const br=document.createElement('div');br.className='tc-bans';blueBans.forEach(b=>br.appendChild(makeCI(b.champion,true,'',true)));bc.appendChild(br);}
   const rc=document.createElement('div'); rc.className='team-col t2';
   const rp=document.createElement('div'); rp.className='tc-picks';
   buildRoleSlots(redPicks,rp); rc.appendChild(rp);
-  if(redBans.length){const br=document.createElement('div');br.className='tc-bans';const l=document.createElement('span');l.className='tc-bans-lbl';l.textContent='BANS';br.appendChild(l);redBans.forEach(b=>br.appendChild(makeCI(b.champion,true,'',true)));rc.appendChild(br);}
-  row.appendChild(bc); row.appendChild(div); row.appendChild(rc);
+  if(redBans.length){const br=document.createElement('div');br.className='tc-bans';redBans.forEach(b=>br.appendChild(makeCI(b.champion,true,'',true)));rc.appendChild(br);}
+  row.appendChild(bc); row.appendChild(rc);
   body.appendChild(row);
 
   // footer
@@ -320,19 +318,27 @@ function renderGraveyard(){
   document.getElementById('grave-count').textContent=`${seen.size} LOCKED`;
   const body=document.getElementById('grave-body'); body.innerHTML='';
   if(!seen.size){body.innerHTML=`<span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(216,201,255,0.18);letter-spacing:2px;">NONE YET</span>`;return;}
+  const bodyRow=document.createElement('div'); bodyRow.className='grave-body-row';
   ROLES.forEach(role=>{
     const entries=byRole[role]; if(!entries.length)return;
     const row=document.createElement('div'); row.className='grave-role-row';
-    const lbl=document.createElement('div'); lbl.className='grave-role-lbl'; lbl.textContent=LABELS[role]; row.appendChild(lbl);
+    if(ROLE_SVG[role]){const ico=document.createElement('div');ico.className='grave-role-icon';ico.innerHTML=ROLE_SVG[role];row.appendChild(ico);}
     const chips=document.createElement('div'); chips.className='grave-chips';
+    const maxGame=Math.max(...entries.map(e=>e.game));
+    chips.style.gridTemplateColumns=`repeat(${maxGame},32px)`;
+    const rowPerGame={};
     entries.forEach(e=>{
       const chip=document.createElement('div'); chip.className='gchip';
+      if(!rowPerGame[e.game])rowPerGame[e.game]=1;
+      chip.style.gridColumn=e.game;
+      chip.style.gridRow=rowPerGame[e.game]++;
       const img=document.createElement('img'); setImg(img,e.champion);
       const tip=document.createElement('div'); tip.className='gtip'; tip.textContent=e.champion+' · G'+e.game;
       chip.appendChild(img); chip.appendChild(tip); chips.appendChild(chip);
     });
-    row.appendChild(chips); body.appendChild(row);
+    row.appendChild(chips); bodyRow.appendChild(row);
   });
+  body.appendChild(bodyRow);
 }
 
 // Firebase realtime listener — fires on every change from admin
