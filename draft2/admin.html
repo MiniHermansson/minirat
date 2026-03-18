@@ -362,6 +362,7 @@ html[data-theme="light"] .adg-title{color:#7A5E0A;}
     <div class="chat-header-title">TEAM CHAT</div>
     <div style="display:flex;align-items:center;gap:8px;">
       <div class="chat-header-count" id="chat-unread"></div>
+      <button id="clear-chat-btn" class="hidden" onclick="event.stopPropagation();clearChat()" style="background:none;border:1px solid rgba(200,0,0,0.4);color:#cc3344;font-family:'Rajdhani',sans-serif;font-size:9px;letter-spacing:1px;padding:2px 7px;cursor:pointer;">CLEAR</button>
       <span id="chat-chevron" style="font-size:10px;color:var(--gold);transition:transform .22s;">▾</span>
     </div>
   </div>
@@ -549,6 +550,9 @@ async function onSignedIn(user){
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('admin-panel').classList.remove('hidden');
   document.getElementById('chat-box').classList.remove('hidden');
+  if(currentUser&&currentUser.email==='jesperhermansson94@gmail.com'){
+    document.getElementById('clear-chat-btn').classList.remove('hidden');
+  }
   document.getElementById('l-pw').value='';
   // Record session start time — only show chat messages from this session onward
   if(!sessionStorage.getItem('chatSessionStart')){
@@ -644,6 +648,12 @@ async function sendChat(){
   const name=currentUser.displayName||currentUser.email.split('@')[0];
   const colour=pColour(currentUser.uid);
   waitFB(async()=>{await window._push(window._ref(window._db,'chat'),{text,name,colour,ts:Date.now()});});
+}
+
+function clearChat(){
+  if(!currentUser||currentUser.email!=='jesperhermansson94@gmail.com')return;
+  if(!confirm('Clear all chat messages?'))return;
+  waitFB(()=>{ window._remove(window._ref(window._db,'chat')); });
 }
 
 // ── CHAT RESIZE (top-left handle) ──
