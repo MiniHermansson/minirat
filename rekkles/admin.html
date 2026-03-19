@@ -325,6 +325,42 @@ a.nav-btn{line-height:normal;}
       </div>
     </div>
 
+    <!-- STATS MANAGEMENT -->
+    <div class="asec">
+      <div class="asec-title" id="stat-section-title">Add Stat</div>
+      <div class="form-row">
+        <div class="fg">
+          <label class="flabel">value (number or text)</label>
+          <input class="fi" type="text" id="stat-value" placeholder="e.g. 2012 or 4x">
+        </div>
+        <div class="fg">
+          <label class="flabel">label</label>
+          <input class="fi" type="text" id="stat-label" placeholder="e.g. Pro Since">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="abtn primary" id="stat-submit-btn">ADD STAT</button>
+        <button class="abtn secondary hidden" id="stat-cancel-btn">CANCEL</button>
+      </div>
+
+      <div class="items-list" id="stat-list">
+        <div class="items-empty">loading...</div>
+      </div>
+    </div>
+
+    <!-- YOUTUBE VIDEO -->
+    <div class="asec">
+      <div class="asec-title">Featured YouTube Video</div>
+      <div class="fg">
+        <label class="flabel">youtube link or video id</label>
+        <input class="fi" type="text" id="yt-input" placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ or just dQw4w9WgXcQ">
+      </div>
+      <div class="btn-row" style="align-items:center;">
+        <button class="abtn primary" id="yt-save-btn">SAVE</button>
+        <span class="yt-current" id="yt-current" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:1px;"></span>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -337,9 +373,11 @@ let allEvents=[];
 let allPeripherals=[];
 let allSpecs=[];
 let allTypes=[];  // [{id,name,color}]
+let allStats=[];
 let editingEventId=null;
 let editingPeriphId=null;
 let editingSpecId=null;
+let editingStatId=null;
 
 const DEFAULT_TYPES=[
   {name:'stream',color:'#E02E41'},
@@ -363,6 +401,8 @@ onFbReady(()=>{
       listenTypes();
       listenCalendar();
       listenGear();
+      listenStats();
+      listenYoutube();
     } else {
       currentUser=null;
       document.getElementById('login-screen').classList.remove('hidden');
@@ -673,6 +713,119 @@ function renderGearList(prefix,items){
     });
     list.appendChild(row);
   });
+}
+
+// ─── Stats CRUD ──────────────────────────────────────────────────────────────
+function listenStats(){
+  window._onValue(window._ref(window._db,'rekkles/stats'),snap=>{
+    allStats=[];
+    if(snap.exists()) snap.forEach(c=>{allStats.push({id:c.key,...c.val()});});
+    allStats.sort((a,b)=>(a.order??99999)-(b.order??99999));
+    renderStatsList();
+  });
+}
+
+document.getElementById('stat-submit-btn').addEventListener('click',()=>{
+  const value=document.getElementById('stat-value').value.trim();
+  const label=document.getElementById('stat-label').value.trim();
+  if(!value||!label){showToast('value and label are required','error');return;}
+  const data={value,label};
+  if(editingStatId){
+    window._update(window._ref(window._db,`rekkles/stats/${editingStatId}`),data);
+    showToast('stat updated','success');
+    cancelEditStat();
+  } else {
+    data.order=allStats.length;
+    data.timestamp=Date.now();
+    window._push(window._ref(window._db,'rekkles/stats'),data);
+    showToast('stat added','success');
+    clearStatForm();
+  }
+});
+
+document.getElementById('stat-cancel-btn').addEventListener('click',cancelEditStat);
+
+function clearStatForm(){
+  document.getElementById('stat-value').value='';
+  document.getElementById('stat-label').value='';
+}
+
+function cancelEditStat(){
+  editingStatId=null;
+  clearStatForm();
+  document.getElementById('stat-section-title').textContent='Add Stat';
+  document.getElementById('stat-submit-btn').textContent='ADD STAT';
+  document.getElementById('stat-cancel-btn').classList.add('hidden');
+}
+
+function startEditStat(item){
+  editingStatId=item.id;
+  document.getElementById('stat-value').value=item.value;
+  document.getElementById('stat-label').value=item.label;
+  document.getElementById('stat-section-title').textContent='Edit Stat';
+  document.getElementById('stat-submit-btn').textContent='UPDATE STAT';
+  document.getElementById('stat-cancel-btn').classList.remove('hidden');
+  document.getElementById('stat-value').focus();
+}
+
+function renderStatsList(){
+  const list=document.getElementById('stat-list');
+  list.innerHTML='';
+  if(!allStats.length){list.innerHTML='<div class="items-empty">no stats yet.</div>';return;}
+  allStats.forEach(item=>{
+    const row=document.createElement('div');
+    row.className='item-row';
+    row.innerHTML=`
+      <div class="item-info">
+        <div class="item-name" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--accent);">${escHtml(item.value)}</div>
+        <div class="item-meta">${escHtml(item.label)}</div>
+      </div>
+      <div class="item-actions">
+        <button class="abtn secondary edit-btn" style="font-size:11px;padding:5px 12px;">EDIT</button>
+        <button class="abtn danger delete-btn">DELETE</button>
+      </div>`;
+    row.querySelector('.edit-btn').addEventListener('click',()=>startEditStat(item));
+    row.querySelector('.delete-btn').addEventListener('click',()=>{
+      if(!confirm(`Delete stat "${item.value}"?`))return;
+      window._remove(window._ref(window._db,`rekkles/stats/${item.id}`));
+      showToast('stat deleted','success');
+      if(editingStatId===item.id)cancelEditStat();
+    });
+    list.appendChild(row);
+  });
+}
+
+// ─── YouTube ─────────────────────────────────────────────────────────────────
+function listenYoutube(){
+  window._onValue(window._ref(window._db,'rekkles/youtube'),snap=>{
+    const val=snap.val();
+    const id=val&&val.videoId||'';
+    document.getElementById('yt-input').value=id;
+    document.getElementById('yt-current').textContent=id?`current: ${id}`:'no video set';
+  });
+}
+
+document.getElementById('yt-save-btn').addEventListener('click',()=>{
+  const raw=document.getElementById('yt-input').value.trim();
+  const videoId=parseYoutubeId(raw);
+  if(!videoId){showToast('invalid youtube link or id','error');return;}
+  window._update(window._ref(window._db,'rekkles/youtube'),{videoId});
+  showToast('video updated','success');
+});
+
+function parseYoutubeId(input){
+  if(!input)return '';
+  // Already a bare ID (11 chars, alphanumeric + - _)
+  if(/^[a-zA-Z0-9_-]{11}$/.test(input))return input;
+  // Full URL patterns
+  const patterns=[
+    /[?&]v=([a-zA-Z0-9_-]{11})/,
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /embed\/([a-zA-Z0-9_-]{11})/,
+    /shorts\/([a-zA-Z0-9_-]{11})/
+  ];
+  for(const p of patterns){const m=input.match(p);if(m)return m[1];}
+  return '';
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

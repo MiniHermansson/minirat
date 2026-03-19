@@ -7,6 +7,89 @@
 <link rel="icon" href="/los-ratones-logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<!-- Firebase -->
+<script type="module">
+  import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import{getDatabase,ref,onValue}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const cfg={apiKey:"AIzaSyCHx89HHT-nHlP7kcNCTT21-2S7jvI9G-c",authDomain:"miniratxyz.firebaseapp.com",
+    databaseURL:"https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:"miniratxyz",storageBucket:"miniratxyz.firebasestorage.app",
+    messagingSenderId:"524360710142",appId:"1:524360710142:web:a99846767a02914a35b2af"};
+  const app=initializeApp(cfg);
+  const db=getDatabase(app);
+
+  function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+  let typeColors={};
+
+  // Load event type colors
+  onValue(ref(db,'rekkles/eventTypes'),snap=>{
+    typeColors={};
+    if(snap.exists()) snap.forEach(c=>{const v=c.val();typeColors[v.name]=v.color;});
+    // Re-render schedule if events already loaded
+    if(window._cachedEvents) renderSchedule(window._cachedEvents);
+  });
+
+  // Stats
+  onValue(ref(db,'rekkles/stats'),snap=>{
+    const items=[];
+    if(snap.exists()) snap.forEach(c=>{items.push({id:c.key,...c.val()});});
+    items.sort((a,b)=>(a.order??99999)-(b.order??99999));
+    const wrap=document.getElementById('stats-grid');
+    if(!items.length){wrap.innerHTML='';return;}
+    wrap.innerHTML=items.map(s=>`
+      <div class="stat-box">
+        <div class="stat-value">${escHtml(s.value)}</div>
+        <div class="stat-label">${escHtml(s.label)}</div>
+      </div>`).join('');
+  });
+
+  // Upcoming schedule
+  onValue(ref(db,'rekkles/calendar'),snap=>{
+    const events=[];
+    if(snap.exists()) snap.forEach(c=>{events.push({id:c.key,...c.val()});});
+    window._cachedEvents=events;
+    renderSchedule(events);
+  });
+
+  // YouTube video
+  onValue(ref(db,'rekkles/youtube'),snap=>{
+    const val=snap.val();
+    const id=val&&val.videoId||'';
+    const wrap=document.getElementById('yt-embed');
+    if(id){
+      wrap.innerHTML=`<iframe src="https://www.youtube.com/embed/${escHtml(id)}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    } else {
+      wrap.innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Share Tech Mono,monospace;font-size:11px;letter-spacing:2px;color:var(--dim);">no video set</div>';
+    }
+  });
+
+  function renderSchedule(events){
+    const wrap=document.getElementById('schedule-list');
+    const today=new Date().toISOString().slice(0,10);
+    const upcoming=events.filter(e=>e.date>=today)
+      .sort((a,b)=>a.date.localeCompare(b.date)||((a.timeStart||a.time||'').localeCompare(b.timeStart||b.time||'')))
+      .slice(0,3);
+    if(!upcoming.length){wrap.innerHTML='<div class="schedule-empty">no upcoming events.</div>';return;}
+    wrap.innerHTML=upcoming.map(e=>{
+      const color=typeColors[e.type]||'#888888';
+      const s=e.timeStart||e.time||'';
+      const en=e.timeEnd||'';
+      const tz=e.tz||'';
+      let timeStr='';
+      if(s){timeStr=en?`${s}-${en}`:s;if(tz)timeStr+=` ${tz}`;}
+      const d=new Date(e.date+'T00:00:00');
+      const dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      return `<div class="schedule-row">
+        <div class="schedule-color" style="background:${color}"></div>
+        <div class="schedule-date">${dateStr}${timeStr?' '+timeStr:''}</div>
+        <div class="schedule-title">${escHtml(e.title)}</div>
+        <div class="schedule-type" style="color:${color}">${escHtml(e.type||'')}</div>
+      </div>`;
+    }).join('');
+  }
+</script>
 <style>
 :root{
   --accent:#E02E41;--accent-dim:rgba(224,46,65,0.55);--accent-bg:rgba(224,46,65,0.12);
@@ -47,6 +130,51 @@ nav{display:flex;align-items:stretch;justify-content:space-between;padding:0 24p
 .hero-sub{font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:3px;color:rgba(237,237,237,0.75);
   text-transform:uppercase;text-shadow:0 1px 8px rgba(0,0,0,0.5);margin-top:15px;}
 
+/* SECTION COMMON */
+.section{max-width:800px;margin:0 auto;padding:48px 20px;position:relative;z-index:1;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:5px;color:var(--accent);
+  margin-bottom:20px;}
+.section-divider{border:none;height:1px;margin:0;
+  background:linear-gradient(to right,transparent,var(--border) 30%,var(--border) 70%,transparent);}
+
+/* ABOUT */
+.about-text{font-size:15px;line-height:1.7;color:var(--text);opacity:.85;
+  border-left:3px solid var(--accent);padding-left:16px;}
+.about-text p{margin-bottom:12px;}
+.about-text p:last-child{margin-bottom:0;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
+.stat-box{background:var(--surface);border:1px solid var(--border);padding:20px 16px;text-align:center;
+  transition:border-color .2s;}
+.stat-box:hover{border-color:var(--accent);}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:var(--accent);line-height:1;}
+.stat-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);
+  margin-top:6px;text-transform:uppercase;}
+
+/* SCHEDULE PREVIEW */
+.schedule-list{display:flex;flex-direction:column;gap:4px;}
+.schedule-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);
+  border:1px solid rgba(224,46,65,0.1);transition:border-color .2s;}
+.schedule-row:hover{border-color:var(--border);}
+.schedule-color{width:4px;height:28px;border-radius:2px;flex-shrink:0;}
+.schedule-date{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--dim);
+  width:130px;flex-shrink:0;}
+.schedule-title{font-size:14px;font-weight:600;color:var(--text);flex:1;}
+.schedule-type{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1.5px;
+  text-transform:uppercase;flex-shrink:0;}
+.schedule-empty{text-align:center;padding:20px;font-family:'Share Tech Mono',monospace;
+  font-size:11px;letter-spacing:2px;color:var(--dim);}
+.schedule-link{display:inline-block;margin-top:14px;font-family:'Rajdhani',sans-serif;font-size:12px;
+  font-weight:600;letter-spacing:1.5px;color:var(--accent);text-decoration:none;text-transform:uppercase;
+  transition:opacity .2s;}
+.schedule-link:hover{opacity:.7;}
+
+/* YOUTUBE */
+.video-wrap{max-width:720px;margin:0 auto;position:relative;padding-bottom:56.25%;height:0;overflow:hidden;
+  border:1px solid var(--border);}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
+
 /* SOCIALS */
 .socials-section{display:flex;flex-direction:column;align-items:center;padding:48px 20px 60px;
   position:relative;z-index:1;}
@@ -68,6 +196,8 @@ nav{display:flex;align-items:stretch;justify-content:space-between;padding:0 24p
   .hero-title{font-size:48px;letter-spacing:8px;}
   .hero{min-height:45vh;}
   .social-link{width:42px;height:42px;font-size:16px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .schedule-date{width:100px;font-size:10px;}
 }
 </style>
 </head>
@@ -89,6 +219,42 @@ nav{display:flex;align-items:stretch;justify-content:space-between;padding:0 24p
     <span class="hero-accent"></span>
     <div class="hero-sub">King in the North since 2012</div>
   </div>
+</div>
+
+<!-- ABOUT -->
+<div class="section">
+  <div class="section-title">About</div>
+  <div class="about-text">
+    <p>Martin "Rekkles" Larsson is one of League of Legends' most iconic players. Since bursting onto the professional scene in 2012, he has established himself as one of the greatest ADC players in European history.</p>
+    <p>Now streaming and creating content, Rekkles continues to connect with fans and compete at the highest level of solo queue.</p>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- CAREER STATS -->
+<div class="section">
+  <div class="section-title">Career Highlights</div>
+  <div class="stats-grid" id="stats-grid"></div>
+</div>
+
+<hr class="section-divider">
+
+<!-- UPCOMING SCHEDULE -->
+<div class="section">
+  <div class="section-title">Upcoming</div>
+  <div class="schedule-list" id="schedule-list">
+    <div class="schedule-empty">loading...</div>
+  </div>
+  <a href="calendar.html" class="schedule-link">View full schedule →</a>
+</div>
+
+<hr class="section-divider">
+
+<!-- YOUTUBE -->
+<div class="section">
+  <div class="section-title">Latest Video</div>
+  <div class="video-wrap" id="yt-embed"></div>
 </div>
 
 <div class="socials-section">
