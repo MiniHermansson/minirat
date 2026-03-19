@@ -9,8 +9,8 @@
 <style>
 :root {
   --gold:#1ABA91; --gold-dim:rgba(26,186,145,0.55); --gold-bg:rgba(26,186,145,0.12);
-  --blue:#4D9EF5; --blue-bg:rgba(77,158,245,0.12); --blue-border:rgba(77,158,245,0.5);
-  --red:#EF4444;  --red-bg:rgba(239,68,68,0.12);   --red-border:rgba(239,68,68,0.5);
+  --blue:#4D9EF5; --blue-bg:#142A3E; --blue-border:rgba(77,158,245,0.5);
+  --red:#EF4444;  --red-bg:#36141A;   --red-border:rgba(239,68,68,0.5);
   --bg:#050F0C; --surface:#081410; --surface2:#0C1A16;
   --border:rgba(26,186,145,0.25); --text:#d8c9ff; --dim:rgba(216,201,255,0.55);
 }
@@ -49,13 +49,13 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
 .game-header{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);border-bottom:none;}
 .game-header-team{display:flex;align-items:center;justify-content:center;padding:4px 14px;
   font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;}
-.game-header-team.blue{color:var(--blue);background:var(--blue-bg);border-right:1px solid var(--border);}
-.game-header-team.red{color:var(--red);background:var(--red-bg);}
+.game-header-team.blue{color:var(--blue);background:var(--surface2);border-right:1px solid var(--border);}
+.game-header-team.red{color:var(--red);background:var(--surface2);}
 .game-footer{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:5px 14px;
   border:1px solid var(--border);border-top:none;align-self:center;
   font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;}
 .game-footer.tbd{background:var(--surface2);color:rgba(208,208,224,0.65);}
-.game-footer.won{background:rgba(26,186,145,0.18);border-color:rgba(26,186,145,0.6);color:var(--gold);}
+.game-footer.won{background:#0D3A2C;border-color:var(--gold);color:#d8d8e4;}
 .game-row{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--border);min-height:80px;position:relative;}
 .team-col{display:flex;flex-direction:column;justify-content:flex-start;padding:8px 12px;gap:5px;}
 .team-col.t1{background:var(--blue-bg);border-right:1px solid var(--border);}
@@ -114,8 +114,8 @@ html[data-theme="light"]{
   --bg:#EDF7F4; --surface:#FFFFFF; --surface2:#D8F0EA;
   --border:rgba(10,140,100,0.25); --text:#0E1E1A; --dim:#2A5A4E;
   --gold:#0F9070; --gold-dim:#13A882; --gold-bg:rgba(15,144,112,0.1);
-  --blue:#1D6FBF; --blue-bg:rgba(29,111,191,0.1); --blue-border:rgba(29,111,191,0.5);
-  --red:#C92E2E; --red-bg:rgba(201,46,46,0.1); --red-border:rgba(201,46,46,0.5);}
+  --blue:#1D6FBF; --blue-bg:#D6E8F6; --blue-border:rgba(29,111,191,0.5);
+  --red:#C92E2E; --red-bg:#F6D6D6; --red-border:rgba(201,46,46,0.5);}
 html[data-theme="light"] body::before{
   background:
     radial-gradient(ellipse 70% 30% at 50% 0%,rgba(15,144,112,0.07) 0%,transparent 60%);}
@@ -136,9 +136,13 @@ html[data-theme="light"] .game-footer.won{background:rgba(122,94,10,0.15);border
 .theme-btn{background:none;border:1px solid var(--border);color:var(--gold);font-size:14px;
   width:30px;height:30px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;padding:0;}
 .theme-btn:hover{border-color:var(--gold);background:var(--gold-bg);}
+#bg-canvas{position:fixed;inset:0;z-index:1;pointer-events:none;}
+#page-wrap{position:relative;z-index:2;}
 </style>
 </head>
 <body>
+<canvas id="bg-canvas"></canvas>
+<div id="page-wrap">
 <nav>
   <div class="nav-logo">FEARLESS <span>SERIES</span></div>
   <div style="display:flex;align-items:center;gap:8px;">
@@ -164,6 +168,7 @@ html[data-theme="light"] .game-footer.won{background:rgba(122,94,10,0.15);border
   <div id="grave-body"></div>
 </div>
 <div id="toast"></div>
+</div>
 <script>
 const FB_URL = 'https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app/draft.json';
 let DD = '15.1.1';
@@ -380,6 +385,62 @@ function toggleTheme(){
 }
 document.getElementById('theme-toggle').textContent=
   (localStorage.getItem('fearless-theme')||'dark')==='dark'?'☀':'☽';
+</script>
+<script>
+(function(){
+  const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');
+  let w,h;
+  const MAX=45;
+  let particles=[];
+  function resize(){w=c.width=window.innerWidth;h=c.height=window.innerHeight;}
+  window.addEventListener('resize',resize);resize();
+  function spawn(){
+    if(particles.length>=MAX)return;
+    const size=Math.random()*4+2;
+    particles.push({
+      x:Math.random()*w,y:Math.random()*h,s:size,
+      life:0,maxLife:Math.random()*6000+4000,
+      delay:Math.random()*4000
+    });
+  }
+  for(let i=0;i<MAX;i++)spawn();
+  let last=0;
+  function draw(t){
+    if(!last)last=t;
+    const dt=t-last;last=t;
+    ctx.clearRect(0,0,w,h);
+    const isDark=(document.documentElement.getAttribute('data-theme')||'dark')==='dark';
+    for(let i=particles.length-1;i>=0;i--){
+      const p=particles[i];
+      if(p.delay>0){p.delay-=dt;continue;}
+      p.life+=dt;
+      if(p.life>=p.maxLife){particles.splice(i,1);spawn();continue;}
+      const progress=p.life/p.maxLife;
+      const fade=progress<0.3?progress/0.3:progress>0.6?(1-progress)/0.4:1;
+      const alpha=fade*(isDark?0.18:0.12);
+      ctx.fillStyle=isDark?`rgba(200,240,220,${alpha})`:`rgba(10,80,50,${alpha})`;
+      ctx.fillRect(p.x,p.y,p.s,p.s);
+      p._alpha=alpha;p._cx=p.x+p.s/2;p._cy=p.y+p.s/2;
+    }
+    const LINE_DIST=150;
+    const visible=particles.filter(p=>p._alpha>0.03);
+    for(let i=0;i<visible.length;i++){
+      for(let j=i+1;j<visible.length;j++){
+        const a=visible[i],b=visible[j];
+        const dx=a._cx-b._cx,dy=a._cy-b._cy;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<LINE_DIST){
+          const strength=(1-dist/LINE_DIST)*Math.min(a._alpha,b._alpha)*0.6;
+          ctx.beginPath();ctx.moveTo(a._cx,a._cy);ctx.lineTo(b._cx,b._cy);
+          ctx.strokeStyle=isDark?`rgba(200,240,220,${strength})`:`rgba(10,80,50,${strength})`;
+          ctx.lineWidth=2;ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
 </script>
 </body>
 </html>
