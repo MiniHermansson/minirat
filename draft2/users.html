@@ -174,6 +174,7 @@ html[data-theme="light"] #toast{color:var(--text);}
           <label class="add-perm-label"><input type="checkbox" id="add-perm-draft2" checked> DRAFT</label>
           <label class="add-perm-label"><input type="checkbox" id="add-perm-rekkles"> REKKLES</label>
           <label class="add-perm-label"><input type="checkbox" id="add-perm-lrtribute"> LR TRIBUTE</label>
+          <label class="add-perm-label"><input type="checkbox" id="add-perm-jackspektra"> JACKSPEKTRA</label>
         </div>
       </div>
       <button class="abtn primary" onclick="addUser()">ADD USER</button>
@@ -336,7 +337,8 @@ async function addUser(){
     const perms={
       draft2:document.getElementById('add-perm-draft2').checked,
       rekkles:document.getElementById('add-perm-rekkles').checked,
-      lrtribute:document.getElementById('add-perm-lrtribute').checked
+      lrtribute:document.getElementById('add-perm-lrtribute').checked,
+      jackspektra:document.getElementById('add-perm-jackspektra').checked
     };
     // Store in /admins so admin.html recognises them
     await new Promise((resolve,reject)=>waitFB(()=>{
@@ -349,6 +351,7 @@ async function addUser(){
     document.getElementById('add-perm-draft2').checked=true;
     document.getElementById('add-perm-rekkles').checked=false;
     document.getElementById('add-perm-lrtribute').checked=false;
+    document.getElementById('add-perm-jackspektra').checked=false;
     toast('User added — '+email);
   }catch(e){
     const msg = e.message||'';
