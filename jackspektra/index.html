@@ -73,7 +73,8 @@ nav{display:flex;align-items:center;justify-content:center;padding:10px 24px;
 .letter-section{margin-bottom:10px;}
 .letter-header{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);
   border:1px solid var(--border);border-bottom:none;cursor:pointer;user-select:none;transition:border-color .2s;}
-.letter-header:hover{border-color:var(--gold-dim);}
+.letter-section:hover .letter-header{border-color:var(--gold-dim);}
+.letter-section:hover .letter-grid{border-color:var(--gold-dim);}
 .letter-header.collapsed{border-bottom:1px solid var(--border);}
 .letter-char{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--gold);width:30px;}
 .letter-count{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--dim);flex:1;}
@@ -85,8 +86,8 @@ nav{display:flex;align-items:center;justify-content:center;padding:10px 24px;
   border:1px solid var(--border);border-top:none;}
 
 /* CHAMPION CARDS */
-.champ-card{width:72px;text-align:center;cursor:pointer;transition:all .2s;position:relative;padding:4px;}
-.champ-card:hover{transform:translateY(-1px);}
+.champ-card{width:72px;text-align:center;cursor:pointer;transition:all .2s;position:relative;padding:4px;border:1px solid transparent;}
+.champ-card:hover{transform:translateY(-1px);border:1px solid var(--gold);}
 .champ-card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:3px;display:block;
   opacity:0.5;transition:opacity .2s;}
 .champ-card.completed img{opacity:1;box-shadow:0 0 6px rgba(212,168,67,0.2);}
