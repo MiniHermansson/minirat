@@ -127,7 +127,7 @@ nav{display:flex;align-items:center;justify-content:center;padding:10px 24px;
   text-align:center;padding:10px 0;}
 
 /* TUTORIAL TOOLTIP */
-.tutorial-tip{position:absolute;z-index:300;background:var(--surface);border:1px solid var(--gold);
+.tutorial-tip{position:fixed;z-index:300;background:var(--surface);border:1px solid var(--gold);
   padding:12px 16px;max-width:220px;opacity:0;transform:translateY(6px);
   transition:opacity .3s,transform .3s;pointer-events:none;}
 .tutorial-tip.show{opacity:1;transform:translateY(0);pointer-events:auto;}
@@ -377,7 +377,7 @@ let tutorialShown=false;
 function showTutorial(){
   if(tutorialShown)return;
   if(localStorage.getItem('jackspektra-tutorial-seen'))return;
-  const card=document.querySelector('.champ-card');
+  const card=document.querySelector('.letter-body.open .champ-card');
   if(!card)return;
   tutorialShown=true;
 
@@ -386,16 +386,15 @@ function showTutorial(){
   tip.innerHTML=`<div class="tutorial-tip-arrow"></div>
     <div class="tutorial-tip-text">Click any champion to view their stats and game details!</div>
     <button class="tutorial-tip-dismiss" onclick="dismissTutorial()">GOT IT</button>`;
-  card.closest('.letter-grid').style.position='relative';
-  card.closest('.letter-grid').appendChild(tip);
+  document.body.appendChild(tip);
 
-  // Position below the first card
-  const gridRect=card.closest('.letter-grid').getBoundingClientRect();
-  const cardRect=card.getBoundingClientRect();
-  tip.style.top=(cardRect.bottom-gridRect.top+8)+'px';
-  tip.style.left=(cardRect.left-gridRect.left)+'px';
-
-  requestAnimationFrame(()=>tip.classList.add('show'));
+  // Position below the first visible card (delay to let letter-body expand)
+  setTimeout(()=>{
+    const cardRect=card.getBoundingClientRect();
+    tip.style.top=(cardRect.top+cardRect.height*0.75+8)+'px';
+    tip.style.left=cardRect.left+'px';
+    tip.classList.add('show');
+  },400);
 }
 
 function dismissTutorial(){
