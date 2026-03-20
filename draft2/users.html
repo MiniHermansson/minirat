@@ -278,7 +278,7 @@ function renderUsers(admins){
     if(bUid===currentUser?.uid) return 1;
     return (a.displayName||a.email).localeCompare(b.displayName||b.email);
   });
-  const PANELS=[{key:'draft2',label:'DRAFT'},{key:'rekkles',label:'REKKLES'},{key:'lrtribute',label:'LR TRIBUTE'}];
+  const PANELS=[{key:'draft2',label:'DRAFT'},{key:'rekkles',label:'REKKLES'},{key:'lrtribute',label:'LR TRIBUTE'},{key:'jackspektra',label:'JACKSPEKTRA'}];
   entries.forEach(([uid, u])=>{
     const isYou = uid === currentUser?.uid;
     const row = document.createElement('div');row.className='user-row';

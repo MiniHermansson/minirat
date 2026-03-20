@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JackSpektra — A-Z Challenge</title>
+<link rel="icon" href="/los-ratones-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<!-- Firebase (read-only) -->
+<script type="module">
+  import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import{getDatabase,ref,onValue}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const cfg={apiKey:"AIzaSyCHx89HHT-nHlP7kcNCTT21-2S7jvI9G-c",authDomain:"miniratxyz.firebaseapp.com",
+    databaseURL:"https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:"miniratxyz",storageBucket:"miniratxyz.firebasestorage.app",
+    messagingSenderId:"524360710142",appId:"1:524360710142:web:a99846767a02914a35b2af"};
+  const app=initializeApp(cfg);
+  const db=getDatabase(app);
+
+  window._db=db;window._ref=ref;window._onValue=onValue;
+  window._fbReady=true;document.dispatchEvent(new Event('fb-ready'));
+</script>
+<style>
+:root{
+  --gold:#D4A843;--gold-dim:rgba(212,168,67,0.55);--gold-bg:rgba(212,168,67,0.12);
+  --bg:#060606;--surface:#111111;--surface2:#191919;
+  --border:rgba(212,168,67,0.2);--text:#E0DACE;--dim:rgba(200,192,176,0.5);
+  --green:#22c55e;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.bg-champ{position:fixed;top:0;right:-20%;bottom:0;width:65%;z-index:0;pointer-events:none;
+  background:url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Draven_0.jpg') right center/cover no-repeat;
+  opacity:0.3;
+  -webkit-mask-image:linear-gradient(to right,transparent 0%,transparent 10%,rgba(0,0,0,0.6) 40%,black 100%);
+  mask-image:linear-gradient(to right,transparent 0%,transparent 10%,rgba(0,0,0,0.6) 40%,black 100%);}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:center;padding:10px 24px;
+  border-bottom:1px solid var(--border);background:rgba(7,7,13,0.97);backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:200;}
+.nav-brand{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:5px;color:var(--gold);text-decoration:none;}
+
+/* MAIN */
+.main{max-width:1000px;margin:0 auto;padding:24px 16px 80px;position:relative;z-index:1;}
+
+/* UP NEXT */
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:var(--gold);margin-bottom:14px;}
+.upcoming{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px;}
+.upcoming-card{background:var(--surface);border:1px solid var(--border);padding:16px 12px;text-align:center;
+  transition:border-color .2s;}
+.upcoming-card:hover{border-color:var(--gold-dim);}
+.upcoming-card img{width:64px;height:64px;border-radius:6px;border:2px solid var(--gold-dim);margin-bottom:8px;}
+.upcoming-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--text);}
+.upcoming-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold-dim);margin-top:4px;}
+.upcoming-empty{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:2px;
+  text-align:center;padding:20px;grid-column:1/-1;}
+
+/* PROGRESS */
+.progress-wrap{margin-bottom:32px;}
+.progress-bar-outer{background:var(--surface);border:1px solid var(--border);height:10px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),#f0d078);transition:width .4s ease;}
+.progress-label{display:flex;justify-content:space-between;margin-top:6px;
+  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--dim);}
+
+/* HINT */
+.grid-hint{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--dim);
+  margin-bottom:8px;opacity:0.6;}
+
+/* LETTER SECTIONS */
+.letter-section{margin-bottom:10px;}
+.letter-header{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);
+  border:1px solid var(--border);border-bottom:none;cursor:pointer;user-select:none;transition:border-color .2s;}
+.letter-header:hover{border-color:var(--gold-dim);}
+.letter-header.collapsed{border-bottom:1px solid var(--border);}
+.letter-char{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--gold);width:30px;}
+.letter-count{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--dim);flex:1;}
+.letter-arrow{color:var(--dim);font-size:10px;transition:transform .25s;}
+.letter-arrow.open{transform:rotate(180deg);}
+.letter-body{overflow:hidden;max-height:0;transition:max-height .35s ease;}
+.letter-body.open{max-height:5000px;}
+.letter-grid{display:flex;flex-wrap:wrap;gap:6px;padding:12px;background:var(--surface);
+  border:1px solid var(--border);border-top:none;}
+
+/* CHAMPION CARDS */
+.champ-card{width:72px;text-align:center;cursor:pointer;transition:all .2s;position:relative;padding:4px;}
+.champ-card:hover{transform:translateY(-1px);}
+.champ-card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:3px;display:block;
+  opacity:0.5;transition:opacity .2s;}
+.champ-card.completed img{opacity:1;box-shadow:0 0 6px rgba(212,168,67,0.2);}
+.champ-card:hover img{opacity:0.8;}
+.champ-card.completed:hover img{opacity:1;}
+.champ-card-name{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.5px;color:var(--dim);
+  margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.champ-card.completed .champ-card-name{color:var(--gold);}
+.champ-check{position:absolute;top:1px;right:1px;width:14px;height:14px;background:var(--green);
+  color:var(--bg);font-size:9px;display:flex;align-items:center;justify-content:center;
+  border-radius:2px;font-weight:bold;line-height:1;}
+
+/* OVERLAY */
+.overlay{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.45);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .2s;}
+.overlay.show{opacity:1;pointer-events:auto;}
+.overlay-box{background:rgba(17,17,17,0.92);border:1px solid var(--border);padding:24px;width:100%;max-width:420px;
+  margin:16px;position:relative;transform:scale(0.95);transition:transform .2s;}
+.overlay.show .overlay-box{transform:scale(1);}
+.overlay-close{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--dim);
+  font-size:18px;cursor:pointer;transition:color .2s;line-height:1;}
+.overlay-close:hover{color:var(--text);}
+
+/* DETAIL CONTENT */
+.detail-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.detail-header img{width:56px;height:56px;border-radius:6px;border:2px solid var(--gold-dim);}
+.detail-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--text);}
+.detail-role{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--gold-dim);}
+.detail-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.detail-stat{background:var(--surface2);border:1px solid var(--border);padding:12px 10px;text-align:center;}
+.detail-stat-value{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold);line-height:1;}
+.detail-stat-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1.5px;color:var(--dim);margin-top:4px;}
+.detail-link{display:block;text-align:center;margin-top:14px;font-family:'Rajdhani',sans-serif;font-size:12px;
+  font-weight:600;letter-spacing:1.5px;color:var(--gold);text-decoration:none;
+  border:1px solid var(--gold);padding:6px 16px;transition:all .2s;}
+.detail-link:hover{background:var(--gold-bg);}
+.detail-pending{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1.5px;
+  text-align:center;padding:10px 0;}
+
+/* LOADING */
+.loading{text-align:center;padding:60px;font-family:'Share Tech Mono',monospace;font-size:11px;
+  letter-spacing:2px;color:var(--dim);}
+
+/* FOOTER */
+.footer{text-align:center;padding:20px;border-top:1px solid rgba(212,168,67,0.1);position:relative;z-index:1;}
+.footer-text{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);}
+
+@media(max-width:540px){
+  .upcoming{grid-template-columns:1fr 1fr 1fr;}
+  .upcoming-card img{width:48px;height:48px;}
+  .upcoming-name{font-size:13px;}
+  .champ-card{width:60px;}
+}
+@media(max-width:380px){
+  .upcoming{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="bg-champ"></div>
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+  <span class="nav-brand">JackSpektra — A-Z Challenge</span>
+</nav>
+
+<div class="main">
+  <!-- UP NEXT -->
+  <div class="section-title">Up Next</div>
+  <div class="upcoming" id="upcoming">
+    <div class="upcoming-empty">loading...</div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="progress-bar-outer">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-label">
+      <span id="progress-text">0 / 0 completed</span>
+      <span id="progress-pct">0%</span>
+    </div>
+  </div>
+
+  <!-- CHAMPION GRID -->
+  <div class="grid-hint" id="grid-hint">click a champion to view stats</div>
+  <div id="champion-grid">
+    <div class="loading">loading champions...</div>
+  </div>
+</div>
+
+<!-- CHAMPION OVERLAY -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeDetail()">
+  <div class="overlay-box">
+    <button class="overlay-close" onclick="closeDetail()">✕</button>
+    <div id="overlay-content"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-text">Created by Miniluva</div>
+</div>
+
+<script>
+let champStats={};
+let DD='15.1.1';
+const CM={},CD_ID={};
+let ALL_CHAMPS=[];
+let openLetters={};
+
+// ── Firebase wait ──
+function onFbReady(cb){if(window._fbReady)cb();else document.addEventListener('fb-ready',cb,{once:true});}
+
+// ── Images ──
+function cdnImg(id){return`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${id}.png`;}
+function cImgDD(name){const k=CM[name];return k?`https://ddragon.leagueoflegends.com/cdn/${DD}/img/champion/${k}.png`:`https://ddragon.leagueoflegends.com/cdn/${DD}/img/champion/${name.replace(/[^a-zA-Z0-9]/g,'')}.png`;}
+function cImg(name){const id=CD_ID[name];return id!==undefined?cdnImg(id):cImgDD(name);}
+
+async function loadChamps(){
+  try{
+    const v=await(await fetch('https://ddragon.leagueoflegends.com/api/versions.json')).json();
+    DD=v[0];
+    const d=await(await fetch(`https://ddragon.leagueoflegends.com/cdn/${DD}/data/en_US/champion.json`)).json();
+    ALL_CHAMPS=Object.keys(d.data).map(k=>({name:d.data[k].name,key:k,id:parseInt(d.data[k].key)})).sort((a,b)=>a.name.localeCompare(b.name));
+    ALL_CHAMPS.forEach(c=>{CM[c.name]=c.key;CD_ID[c.name]=c.id;});
+  }catch(e){console.warn('Failed to load champions',e);}
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── Init ──
+async function init(){
+  await loadChamps();
+  onFbReady(()=>{
+    window._onValue(window._ref(window._db,'jackspektra/champions'),snap=>{
+      champStats=snap.exists()?snap.val():{};
+      renderAll();
+    });
+  });
+}
+
+// ── Group by letter ──
+function groupByLetter(){
+  const groups={};
+  ALL_CHAMPS.forEach(c=>{
+    const letter=c.name[0].toUpperCase();
+    if(!groups[letter])groups[letter]=[];
+    groups[letter].push(c);
+  });
+  return groups;
+}
+
+// ── Render ──
+function renderAll(){
+  renderUpcoming();
+  renderProgress();
+  renderGrid();
+}
+
+function renderUpcoming(){
+  const wrap=document.getElementById('upcoming');
+  const upcoming=ALL_CHAMPS.filter(c=>!champStats[c.key]||!champStats[c.key].completed).slice(0,3);
+  if(!upcoming.length){
+    wrap.innerHTML='<div class="upcoming-empty">all champions completed!</div>';
+    return;
+  }
+  wrap.innerHTML=upcoming.map(c=>`
+    <div class="upcoming-card">
+      <img src="${escHtml(cImg(c.name))}" alt="${escHtml(c.name)}" loading="lazy"
+        onerror="this.src='${escHtml(cImgDD(c.name))}';this.onerror=null;">
+      <div class="upcoming-name">${escHtml(c.name)}</div>
+      <div class="upcoming-label">UP NEXT</div>
+    </div>`).join('');
+}
+
+function renderProgress(){
+  const total=ALL_CHAMPS.length;
+  const done=ALL_CHAMPS.filter(c=>champStats[c.key]&&champStats[c.key].completed).length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-text').textContent=`${done} / ${total} completed`;
+  document.getElementById('progress-pct').textContent=pct+'%';
+}
+
+function renderGrid(){
+  const wrap=document.getElementById('champion-grid');
+  const groups=groupByLetter();
+  const letters=Object.keys(groups).sort();
+
+  // Auto-open the letter of the first uncompleted champion
+  if(Object.keys(openLetters).length===0){
+    const firstUncompleted=ALL_CHAMPS.find(c=>!champStats[c.key]||!champStats[c.key].completed);
+    if(firstUncompleted){
+      openLetters[firstUncompleted.name[0].toUpperCase()]=true;
+    }
+  }
+
+  wrap.innerHTML=letters.map(letter=>{
+    const champs=groups[letter];
+    const doneCount=champs.filter(c=>champStats[c.key]&&champStats[c.key].completed).length;
+    const isOpen=!!openLetters[letter];
+    const allDone=doneCount===champs.length;
+
+    let champsHtml='';
+    champs.forEach(c=>{
+      const stats=champStats[c.key]||{};
+      const done=!!stats.completed;
+      champsHtml+=`<div class="champ-card ${done?'completed':''}" onclick="showDetail('${c.key}')">
+        ${done?'<div class="champ-check">✓</div>':''}
+        <img src="${escHtml(cImg(c.name))}" alt="${escHtml(c.name)}" loading="lazy"
+          onerror="this.src='${escHtml(cImgDD(c.name))}';this.onerror=null;">
+        <div class="champ-card-name">${escHtml(c.name)}</div>
+      </div>`;
+    });
+
+    return`<div class="letter-section">
+      <div class="letter-header${isOpen?'':' collapsed'}" onclick="toggleLetter('${letter}')">
+        <span class="letter-char"${allDone?' style="color:var(--green)"':''}>${letter}</span>
+        <span class="letter-count">${doneCount}/${champs.length} completed</span>
+        <span class="letter-arrow ${isOpen?'open':''}">▼</span>
+      </div>
+      <div class="letter-body ${isOpen?'open':''}">
+        <div class="letter-grid">${champsHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showDetail(key){
+  const champ=ALL_CHAMPS.find(c=>c.key===key);
+  if(!champ)return;
+  const stats=champStats[key]||{};
+  const done=!!stats.completed;
+
+  let statsHtml;
+  if(done){
+    statsHtml=`
+      <div class="detail-stats">
+        <div class="detail-stat"><div class="detail-stat-value">${stats.attempts||0}</div><div class="detail-stat-label">ATTEMPTS</div></div>
+        <div class="detail-stat"><div class="detail-stat-value">${stats.kills||0}/${stats.deaths||0}/${stats.assists||0}</div><div class="detail-stat-label">K/D/A</div></div>
+        <div class="detail-stat"><div class="detail-stat-value">${stats.cspm||0}</div><div class="detail-stat-label">CS/MIN</div></div>
+        <div class="detail-stat"><div class="detail-stat-value">${escHtml(stats.role||'—')}</div><div class="detail-stat-label">ROLE</div></div>
+      </div>
+      ${stats.victoryLink?`<a href="${escHtml(stats.victoryLink)}" target="_blank" rel="noopener" class="detail-link">VIEW VICTORY ON OP.GG ↗</a>`:''}`;
+  } else {
+    statsHtml=`<div class="detail-pending">not yet completed</div>`;
+  }
+
+  document.getElementById('overlay-content').innerHTML=`
+    <div class="detail-header">
+      <img src="${escHtml(cImg(champ.name))}" alt="${escHtml(champ.name)}"
+        onerror="this.src='${escHtml(cImgDD(champ.name))}';this.onerror=null;">
+      <div>
+        <div class="detail-name">${escHtml(champ.name)}</div>
+        ${stats.role?`<div class="detail-role">${escHtml(stats.role)}</div>`:''}
+      </div>
+    </div>
+    ${statsHtml}`;
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeDetail(){
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function toggleLetter(letter){
+  openLetters[letter]=!openLetters[letter];
+  renderGrid();
+}
+
+init();
+</script>
+<script>
+(function(){
+  const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');
+  let w,h;
+  const MAX=45;
+  let particles=[];
+  function resize(){w=c.width=window.innerWidth;h=c.height=window.innerHeight;}
+  window.addEventListener('resize',resize);resize();
+  function spawn(){
+    if(particles.length>=MAX)return;
+    const size=Math.random()*4+2;
+    particles.push({
+      x:Math.random()*w,y:Math.random()*h,s:size,
+      life:0,maxLife:Math.random()*6000+4000,
+      delay:Math.random()*4000
+    });
+  }
+  for(let i=0;i<MAX;i++)spawn();
+  let last=0;
+  function draw(t){
+    if(!last)last=t;
+    const dt=t-last;last=t;
+    ctx.clearRect(0,0,w,h);
+    for(let i=particles.length-1;i>=0;i--){
+      const p=particles[i];
+      if(p.delay>0){p.delay-=dt;continue;}
+      p.life+=dt;
+      if(p.life>=p.maxLife){particles.splice(i,1);spawn();continue;}
+      const progress=p.life/p.maxLife;
+      const fade=progress<0.3?progress/0.3:progress>0.6?(1-progress)/0.4:1;
+      const alpha=fade*0.15;
+      ctx.fillStyle=`rgba(212,168,67,${alpha})`;
+      ctx.fillRect(p.x,p.y,p.s,p.s);
+      p._alpha=alpha;p._cx=p.x+p.s/2;p._cy=p.y+p.s/2;
+    }
+    const LINE_DIST=150;
+    const visible=particles.filter(p=>p._alpha>0.03);
+    for(let i=0;i<visible.length;i++){
+      for(let j=i+1;j<visible.length;j++){
+        const a=visible[i],b=visible[j];
+        const dx=a._cx-b._cx,dy=a._cy-b._cy;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<LINE_DIST){
+          const strength=(1-dist/LINE_DIST)*Math.min(a._alpha,b._alpha)*0.6;
+          ctx.beginPath();ctx.moveTo(a._cx,a._cy);ctx.lineTo(b._cx,b._cy);
+          ctx.strokeStyle=`rgba(212,168,67,${strength})`;
+          ctx.lineWidth=2;ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

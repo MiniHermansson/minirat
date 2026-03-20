@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JackSpektra A-Z — Admin</title>
+<link rel="icon" href="/los-ratones-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script type="module">
+  import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import{getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import{getDatabase,ref,onValue,update,get}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const cfg={apiKey:"AIzaSyCHx89HHT-nHlP7kcNCTT21-2S7jvI9G-c",authDomain:"miniratxyz.firebaseapp.com",
+    databaseURL:"https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:"miniratxyz",storageBucket:"miniratxyz.firebasestorage.app",
+    messagingSenderId:"524360710142",appId:"1:524360710142:web:a99846767a02914a35b2af"};
+  const app=initializeApp(cfg);
+  const auth=getAuth(app);
+  const db=getDatabase(app);
+
+  window._auth=auth; window._db=db;
+  window._ref=ref; window._onValue=onValue;
+  window._update=update; window._get=get;
+  window._signIn=signInWithEmailAndPassword; window._signOut=signOut; window._onAuth=onAuthStateChanged;
+  window._fbReady=true; document.dispatchEvent(new Event('fb-ready'));
+</script>
+<style>
+:root{
+  --gold:#D4A843;--gold-dim:rgba(212,168,67,0.55);--gold-bg:rgba(212,168,67,0.12);
+  --bg:#07070D;--surface:#131320;--surface2:#1A1A2A;
+  --border:rgba(212,168,67,0.25);--text:#D0D0E0;--dim:rgba(208,208,224,0.55);
+  --red:#F55555;--red-bg:rgba(245,85,85,0.10);--red-border:rgba(245,85,85,0.4);
+  --green:#4ade80;--green-bg:rgba(74,222,128,0.10);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 70% 30% at 50% 0%,rgba(212,168,67,0.08) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 80% at 0% 50%,rgba(212,168,67,0.04) 0%,transparent 55%),
+    radial-gradient(ellipse 30% 80% at 100% 50%,rgba(212,168,67,0.04) 0%,transparent 55%);}
+.hidden{display:none!important;}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;
+  background:var(--bg);}
+.login-box{background:var(--surface);border:1px solid var(--border);padding:32px 28px;width:100%;max-width:360px;}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:5px;color:var(--gold);margin-bottom:4px;}
+.login-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--dim);margin-bottom:24px;}
+.login-err{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--red);margin-bottom:12px;display:none;}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24px;
+  border-bottom:1px solid var(--border);background:rgba(7,7,13,0.97);backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:200;}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:4px;color:var(--gold);}
+.nav-logo span{color:var(--dim);font-size:11px;letter-spacing:2px;margin-left:8px;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-user{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:1px;}
+.nav-btn{background:none;border:1px solid var(--border);color:var(--text);font-family:'Rajdhani',sans-serif;
+  font-size:12px;letter-spacing:1.5px;padding:5px 16px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.nav-btn:hover{border-color:var(--gold);color:var(--gold);}
+.nav-btn.danger{border-color:var(--red-border);color:var(--red);}
+.nav-btn.danger:hover{background:var(--red-bg);}
+a.nav-btn{line-height:normal;}
+
+/* CONTENT */
+.admin-wrap{max-width:1100px;margin:0 auto;padding:24px 16px 100px;position:relative;z-index:1;}
+.admin-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:var(--gold);}
+.admin-sub{font-size:11px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:24px;font-family:'Share Tech Mono',monospace;}
+
+.asec{background:var(--surface);border:1px solid var(--border);padding:18px;margin-bottom:16px;}
+.asec-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--gold);
+  padding-bottom:10px;margin-bottom:14px;border-bottom:1px solid var(--border);}
+
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.flabel{font-family:'Rajdhani',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;}
+.fi,.fs{background:var(--bg);border:1px solid var(--border);color:var(--text);
+  font-family:'Rajdhani',sans-serif;font-size:13px;padding:8px 10px;outline:none;transition:border-color .2s;width:100%;}
+.fi:focus,.fs:focus{border-color:var(--gold);}
+.fs{cursor:pointer;-webkit-appearance:none;appearance:none;}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;}
+
+.abtn{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;padding:8px 20px;
+  cursor:pointer;border:1px solid;transition:all .2s;}
+.abtn.primary{background:var(--gold-bg);border-color:var(--gold);color:var(--gold);}
+.abtn.primary:hover{background:rgba(212,168,67,0.22);}
+
+/* SEARCH & FILTER */
+.search-bar{display:flex;gap:10px;align-items:center;margin-bottom:14px;}
+.search-bar .fi{flex:1;}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;}
+.filter-btn{background:none;border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;
+  font-size:10px;letter-spacing:1.5px;padding:5px 12px;cursor:pointer;transition:all .2s;}
+.filter-btn:hover{border-color:var(--gold-dim);color:var(--text);}
+.filter-btn.active{background:var(--gold-bg);border-color:var(--gold);color:var(--gold);}
+
+/* CHAMPION ROWS */
+.champ-row{background:var(--surface);border:1px solid var(--border);margin-bottom:4px;
+  display:flex;align-items:center;gap:8px;padding:6px 10px;transition:border-color .2s;}
+.champ-row:hover{border-color:var(--gold-dim);}
+.champ-row img{width:32px;height:32px;border-radius:3px;border:1px solid var(--border);flex-shrink:0;}
+.champ-row-name{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;width:90px;flex-shrink:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.champ-row .fi,.champ-row .fs{padding:4px 6px;font-size:11px;margin:0;width:100%;}
+.champ-row .fg{margin:0;gap:1px;min-width:0;flex:1;}
+.champ-row .fg.fg-sm{max-width:50px;flex:0 0 50px;}
+.champ-row .flabel{font-size:8px;letter-spacing:1px;}
+.champ-row .abtn{padding:4px 10px;font-size:11px;white-space:nowrap;flex-shrink:0;}
+.champ-fields{display:flex;align-items:flex-end;gap:6px;flex:1;min-width:0;flex-wrap:wrap;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);
+  padding:10px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;
+  color:var(--text);z-index:9999;opacity:0;transform:translateY(10px);
+  transition:opacity .25s,transform .25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.success{border-color:var(--green);color:var(--green);}
+.toast.error{border-color:var(--red-border);color:var(--red);}
+
+/* LOADING */
+.loading{text-align:center;padding:40px;font-family:'Share Tech Mono',monospace;font-size:11px;
+  letter-spacing:2px;color:var(--dim);}
+
+@media(max-width:700px){
+  .champ-row{flex-wrap:wrap;}
+  .champ-fields{flex-basis:100%;}
+  .search-bar{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-title">JackSpektra A-Z</div>
+    <div class="login-sub">admin access</div>
+    <div class="login-err" id="login-err"></div>
+    <div class="fg">
+      <label class="flabel">email</label>
+      <input class="fi" type="email" id="login-email" placeholder="admin@example.com" autocomplete="email">
+    </div>
+    <div class="fg">
+      <label class="flabel">password</label>
+      <input class="fi" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="abtn primary" id="login-btn" style="width:100%;margin-top:6px;">SIGN IN</button>
+  </div>
+</div>
+
+<!-- MAIN PANEL -->
+<div id="admin-panel" class="hidden">
+  <nav>
+    <div class="nav-logo">JackSpektra A-Z <span>ADMIN</span></div>
+    <div class="nav-right">
+      <a href="index.html" class="nav-btn" target="_blank">VIEW PAGE ↗</a>
+      <span class="nav-user" id="nav-user"></span>
+      <button class="nav-btn danger" id="signout-btn">SIGN OUT</button>
+    </div>
+  </nav>
+
+  <div class="admin-wrap">
+    <div class="admin-title">A-Z Challenge</div>
+    <div class="admin-sub">manage champion progress</div>
+
+    <!-- SEARCH / FILTER -->
+    <div class="asec">
+      <div class="search-bar">
+        <input class="fi" id="champ-search" placeholder="Search champion...">
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" data-filter="all">ALL</button>
+        <button class="filter-btn" data-filter="completed">COMPLETED</button>
+        <button class="filter-btn" data-filter="pending">PENDING</button>
+      </div>
+    </div>
+
+    <!-- CHAMPION LIST -->
+    <div id="champ-list">
+      <div class="loading">loading champions...</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentUser=null;
+let champStats={};
+let DD='15.1.1';
+const CM={},CD_ID={};
+let ALL_CHAMPS=[];
+let currentFilter='all';
+let currentSearch='';
+
+// ── Firebase wait ──
+function onFbReady(cb){if(window._fbReady)cb();else document.addEventListener('fb-ready',cb,{once:true});}
+
+// ── Permission check ──
+function checkPanelAccess(uid,email,panel){
+  return new Promise(resolve=>{
+    onFbReady(()=>{
+      const unsub=window._onValue(window._ref(window._db,'admins/'+uid),snap=>{
+        unsub();
+        if(!snap.exists()){resolve(false);return;}
+        if(email==='jesperhermansson94@gmail.com'){resolve(true);return;}
+        const data=snap.val();
+        resolve(!!(data.permissions&&data.permissions[panel]));
+      },()=>{resolve(false);});
+    });
+  });
+}
+
+// ── Auth ──
+onFbReady(()=>{
+  window._onAuth(window._auth,async user=>{
+    if(user){
+      const allowed=await checkPanelAccess(user.uid,user.email,'jackspektra');
+      if(!allowed){
+        const errEl=document.getElementById('login-err');
+        errEl.textContent='You do not have access to the JackSpektra panel.';
+        errEl.style.display='block';
+        await window._signOut(window._auth);
+        return;
+      }
+      currentUser=user;
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('admin-panel').classList.remove('hidden');
+      document.getElementById('nav-user').textContent=user.email;
+      init();
+    } else {
+      currentUser=null;
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('admin-panel').classList.add('hidden');
+    }
+  });
+});
+
+document.getElementById('login-btn').addEventListener('click',doLogin);
+document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-err');
+  errEl.style.display='none';
+  if(!email||!pass)return;
+  document.getElementById('login-btn').textContent='SIGNING IN...';
+  window._signIn(window._auth,email,pass).catch(err=>{
+    errEl.textContent=err.code==='auth/invalid-credential'?'invalid email or password.':err.message;
+    errEl.style.display='block';
+    document.getElementById('login-btn').textContent='SIGN IN';
+  });
+}
+document.getElementById('signout-btn').addEventListener('click',()=>{window._signOut(window._auth);});
+
+// ── Images ──
+function cdnImg(id){return`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${id}.png`;}
+function cImgDD(name){const k=CM[name];return k?`https://ddragon.leagueoflegends.com/cdn/${DD}/img/champion/${k}.png`:`https://ddragon.leagueoflegends.com/cdn/${DD}/img/champion/${name.replace(/[^a-zA-Z0-9]/g,'')}.png`;}
+function cImg(name){const id=CD_ID[name];return id!==undefined?cdnImg(id):cImgDD(name);}
+function setImg(el,name){el.src=cImg(name);el.onerror=function(){const dd=cImgDD(name);if(this.src!==dd)this.src=dd;else{this.style.opacity=0.3;this.onerror=null;}};}
+
+async function loadChamps(){
+  try{
+    const v=await(await fetch('https://ddragon.leagueoflegends.com/api/versions.json')).json();
+    DD=v[0];
+    const d=await(await fetch(`https://ddragon.leagueoflegends.com/cdn/${DD}/data/en_US/champion.json`)).json();
+    ALL_CHAMPS=Object.keys(d.data).map(k=>({name:d.data[k].name,key:k,id:parseInt(d.data[k].key)})).sort((a,b)=>a.name.localeCompare(b.name));
+    ALL_CHAMPS.forEach(c=>{CM[c.name]=c.key;CD_ID[c.name]=c.id;});
+  }catch(e){console.warn('Failed to load champions',e);}
+}
+
+// ── Init ──
+async function init(){
+  await loadChamps();
+  listenChampData();
+}
+
+function listenChampData(){
+  onFbReady(()=>{
+    window._onValue(window._ref(window._db,'jackspektra/champions'),snap=>{
+      champStats=snap.exists()?snap.val():{};
+      renderChampList();
+    });
+  });
+}
+
+// ── Render ──
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function renderChampList(){
+  const wrap=document.getElementById('champ-list');
+  const search=currentSearch.toLowerCase();
+  const filtered=ALL_CHAMPS.filter(c=>{
+    if(search&&!c.name.toLowerCase().includes(search))return false;
+    const stats=champStats[c.key]||{};
+    if(currentFilter==='completed'&&!stats.completed)return false;
+    if(currentFilter==='pending'&&stats.completed)return false;
+    return true;
+  });
+  if(!filtered.length){wrap.innerHTML='<div class="loading">no champions found.</div>';return;}
+  wrap.innerHTML=filtered.map(c=>{
+    const stats=champStats[c.key]||{};
+    const done=!!stats.completed;
+    return`<div class="champ-row">
+      <img src="${escHtml(cImg(c.name))}" alt="${escHtml(c.name)}" loading="lazy"
+        onerror="this.src='${escHtml(cImgDD(c.name))}';this.onerror=null;">
+      <span class="champ-row-name">${escHtml(c.name)}</span>
+      <div class="champ-fields">
+        <div class="fg"><label class="flabel">Done</label>
+          <select class="fs" id="f-completed-${c.key}">
+            <option value="false"${!done?' selected':''}>No</option>
+            <option value="true"${done?' selected':''}>Yes</option>
+          </select></div>
+        <div class="fg"><label class="flabel">Role</label>
+          <select class="fs" id="f-role-${c.key}">
+            <option value=""${!stats.role?' selected':''}>—</option>
+            <option value="Top"${stats.role==='Top'?' selected':''}>Top</option>
+            <option value="Jungle"${stats.role==='Jungle'?' selected':''}>Jungle</option>
+            <option value="Mid"${stats.role==='Mid'?' selected':''}>Mid</option>
+            <option value="Bot"${stats.role==='Bot'?' selected':''}>Bot</option>
+            <option value="Support"${stats.role==='Support'?' selected':''}>Support</option>
+          </select></div>
+        <div class="fg"><label class="flabel">Attempts</label><input class="fi" type="number" min="0" id="f-attempts-${c.key}" value="${stats.attempts||0}"></div>
+        <div class="fg fg-sm"><label class="flabel">K</label><input class="fi" type="number" min="0" id="f-kills-${c.key}" value="${stats.kills||0}"></div>
+        <div class="fg fg-sm"><label class="flabel">D</label><input class="fi" type="number" min="0" id="f-deaths-${c.key}" value="${stats.deaths||0}"></div>
+        <div class="fg fg-sm"><label class="flabel">A</label><input class="fi" type="number" min="0" id="f-assists-${c.key}" value="${stats.assists||0}"></div>
+        <div class="fg"><label class="flabel">CS/M</label><input class="fi" type="number" step="0.1" min="0" id="f-cspm-${c.key}" value="${stats.cspm||0}"></div>
+        <div class="fg" style="flex:2;"><label class="flabel">Victory Link</label><input class="fi" type="url" id="f-victoryLink-${c.key}" value="${escHtml(stats.victoryLink||'')}" placeholder="op.gg link"></div>
+      </div>
+      <button class="abtn primary" onclick="saveChampion('${c.key}')">SAVE</button>
+    </div>`;
+  }).join('');
+}
+
+function saveChampion(key){
+  const data={
+    completed:document.getElementById('f-completed-'+key).value==='true',
+    role:document.getElementById('f-role-'+key).value,
+    attempts:parseInt(document.getElementById('f-attempts-'+key).value)||0,
+    kills:parseInt(document.getElementById('f-kills-'+key).value)||0,
+    deaths:parseInt(document.getElementById('f-deaths-'+key).value)||0,
+    assists:parseInt(document.getElementById('f-assists-'+key).value)||0,
+    cspm:parseFloat(document.getElementById('f-cspm-'+key).value)||0,
+    victoryLink:document.getElementById('f-victoryLink-'+key).value.trim()
+  };
+  onFbReady(()=>{
+    window._update(window._ref(window._db,'jackspektra/champions/'+key),data)
+      .then(()=>showToast('Saved!','success'))
+      .catch(()=>showToast('Save failed','error'));
+  });
+}
+
+// ── Search & Filter ──
+document.getElementById('champ-search').addEventListener('input',e=>{
+  currentSearch=e.target.value;
+  renderChampList();
+});
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter=btn.dataset.filter;
+    renderChampList();
+  });
+});
+
+// ── Toast ──
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show '+(type||'');
+  setTimeout(()=>{t.className='toast';},2500);
+}
+</script>
+</body>
+</html>
