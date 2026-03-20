@@ -51,7 +51,6 @@ nav{display:flex;align-items:center;justify-content:center;padding:10px 24px;
 .upcoming{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px;}
 .upcoming-card{background:var(--surface);border:1px solid var(--border);padding:16px 12px;text-align:center;
   transition:border-color .2s;}
-.upcoming-card:hover{border-color:var(--gold-dim);}
 .upcoming-card img{width:64px;height:64px;border-radius:6px;border:2px solid var(--gold-dim);margin-bottom:8px;}
 .upcoming-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--text);}
 .upcoming-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold-dim);margin-top:4px;}
@@ -73,8 +72,8 @@ nav{display:flex;align-items:center;justify-content:center;padding:10px 24px;
 .letter-section{margin-bottom:10px;}
 .letter-header{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);
   border:1px solid var(--border);border-bottom:none;cursor:pointer;user-select:none;transition:border-color .2s;}
-.letter-section:hover .letter-header{border-color:var(--gold-dim);}
-.letter-section:hover .letter-grid{border-color:var(--gold-dim);}
+.letter-section:hover .letter-header{border-color:rgba(212,168,67,0.35);}
+.letter-section:hover .letter-grid{border-color:rgba(212,168,67,0.35);}
 .letter-header.collapsed{border-bottom:1px solid var(--border);}
 .letter-char{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--gold);width:30px;}
 .letter-count{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--dim);flex:1;}
