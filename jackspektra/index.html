@@ -126,6 +126,21 @@ nav{display:flex;align-items:center;justify-content:center;padding:10px 24px;
 .detail-pending{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1.5px;
   text-align:center;padding:10px 0;}
 
+/* TUTORIAL TOOLTIP */
+.tutorial-tip{position:absolute;z-index:300;background:var(--surface);border:1px solid var(--gold);
+  padding:12px 16px;max-width:220px;opacity:0;transform:translateY(6px);
+  transition:opacity .3s,transform .3s;pointer-events:none;}
+.tutorial-tip.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+.tutorial-tip-text{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;
+  color:var(--text);line-height:1.5;}
+.tutorial-tip-dismiss{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px;
+  color:var(--gold);background:none;border:1px solid var(--gold);padding:4px 12px;
+  cursor:pointer;margin-top:10px;transition:background .2s;}
+.tutorial-tip-dismiss:hover{background:var(--gold-bg);}
+.tutorial-tip-arrow{position:absolute;top:-7px;left:24px;width:12px;height:7px;overflow:hidden;}
+.tutorial-tip-arrow::after{content:'';position:absolute;top:3px;left:0;width:10px;height:10px;
+  background:var(--surface);border:1px solid var(--gold);transform:rotate(45deg);}
+
 /* LOADING */
 .loading{text-align:center;padding:60px;font-family:'Share Tech Mono',monospace;font-size:11px;
   letter-spacing:2px;color:var(--dim);}
@@ -244,6 +259,7 @@ function renderAll(){
   renderUpcoming();
   renderProgress();
   renderGrid();
+  showTutorial();
 }
 
 function renderUpcoming(){
@@ -355,6 +371,40 @@ function closeDetail(){
 function toggleLetter(letter){
   openLetters[letter]=!openLetters[letter];
   renderGrid();
+}
+
+let tutorialShown=false;
+function showTutorial(){
+  if(tutorialShown)return;
+  if(localStorage.getItem('jackspektra-tutorial-seen'))return;
+  const card=document.querySelector('.champ-card');
+  if(!card)return;
+  tutorialShown=true;
+
+  const tip=document.createElement('div');
+  tip.className='tutorial-tip';
+  tip.innerHTML=`<div class="tutorial-tip-arrow"></div>
+    <div class="tutorial-tip-text">Click any champion to view their stats and game details!</div>
+    <button class="tutorial-tip-dismiss" onclick="dismissTutorial()">GOT IT</button>`;
+  card.closest('.letter-grid').style.position='relative';
+  card.closest('.letter-grid').appendChild(tip);
+
+  // Position below the first card
+  const gridRect=card.closest('.letter-grid').getBoundingClientRect();
+  const cardRect=card.getBoundingClientRect();
+  tip.style.top=(cardRect.bottom-gridRect.top+8)+'px';
+  tip.style.left=(cardRect.left-gridRect.left)+'px';
+
+  requestAnimationFrame(()=>tip.classList.add('show'));
+}
+
+function dismissTutorial(){
+  localStorage.setItem('jackspektra-tutorial-seen','1');
+  const tip=document.querySelector('.tutorial-tip');
+  if(tip){
+    tip.classList.remove('show');
+    setTimeout(()=>tip.remove(),300);
+  }
 }
 
 init();
