@@ -9,14 +9,14 @@
 <script type="module">
   import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import{getAuth,signInWithEmailAndPassword,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import{getDatabase,ref,set,onValue,remove}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import{getDatabase,ref,set,onValue,remove,update}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
   const cfg={apiKey:"AIzaSyCHx89HHT-nHlP7kcNCTT21-2S7jvI9G-c",authDomain:"miniratxyz.firebaseapp.com",
     databaseURL:"https://miniratxyz-default-rtdb.europe-west1.firebasedatabase.app",
     projectId:"miniratxyz",storageBucket:"miniratxyz.firebasestorage.app",
     messagingSenderId:"524360710142",appId:"1:524360710142:web:a99846767a02914a35b2af"};
   const app=initializeApp(cfg);
   window._auth=getAuth(app); window._db=getDatabase(app);
-  window._ref=ref; window._set=set; window._onValue=onValue; window._remove=remove;
+  window._ref=ref; window._set=set; window._onValue=onValue; window._remove=remove; window._update=update;
   window._signIn=signInWithEmailAndPassword; window._signOut=signOut;
   window._fbReady=true; document.dispatchEvent(new Event('fb-ready'));
 </script>
@@ -77,6 +77,17 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:9px 24
 .user-email{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px;}
 .user-empty{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);
   letter-spacing:1px;padding:18px 0;text-align:center;}
+
+.perm-row{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;}
+.perm-label{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:1px;color:var(--dim);cursor:pointer;user-select:none;}
+.perm-label input[type="checkbox"]{accent-color:var(--gold);cursor:pointer;width:13px;height:13px;}
+.perm-label.checked{color:var(--gold);}
+
+.add-perm-row{display:flex;gap:12px;margin-top:4px;margin-bottom:9px;flex-wrap:wrap;}
+.add-perm-label{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:1px;color:var(--dim);cursor:pointer;user-select:none;}
+.add-perm-label input[type="checkbox"]{accent-color:var(--gold);cursor:pointer;width:13px;height:13px;}
 
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;position:relative;z-index:1;}
 .login-box{background:var(--surface);border:1px solid var(--border);padding:36px 44px;text-align:center;min-width:320px;}
@@ -155,6 +166,14 @@ html[data-theme="light"] #toast{color:var(--text);}
         <div class="fg">
           <div class="flabel">Temporary Password</div>
           <input class="fi" id="u-pw" type="text" placeholder="min 6 characters">
+        </div>
+      </div>
+      <div class="fg">
+        <div class="flabel">Panel Access</div>
+        <div class="add-perm-row">
+          <label class="add-perm-label"><input type="checkbox" id="add-perm-draft2" checked> DRAFT</label>
+          <label class="add-perm-label"><input type="checkbox" id="add-perm-rekkles"> REKKLES</label>
+          <label class="add-perm-label"><input type="checkbox" id="add-perm-lrtribute"> LR TRIBUTE</label>
         </div>
       </div>
       <button class="abtn primary" onclick="addUser()">ADD USER</button>
@@ -259,15 +278,37 @@ function renderUsers(admins){
     if(bUid===currentUser?.uid) return 1;
     return (a.displayName||a.email).localeCompare(b.displayName||b.email);
   });
+  const PANELS=[{key:'draft2',label:'DRAFT'},{key:'rekkles',label:'REKKLES'},{key:'lrtribute',label:'LR TRIBUTE'}];
   entries.forEach(([uid, u])=>{
     const isYou = uid === currentUser?.uid;
     const row = document.createElement('div');row.className='user-row';
-    const info = document.createElement('div');info.className='user-info';
+    row.style.flexWrap='wrap';
+    const info = document.createElement('div');info.className='user-info';info.style.flex='1';
     const nameRow = document.createElement('div');nameRow.className='user-name';
     nameRow.textContent = (u.displayName||'—').toUpperCase();
-    if(isYou){const tag=document.createElement('span');tag.className='user-tag you';tag.textContent='YOU';nameRow.appendChild(tag);}
+    if(isYou){const tag=document.createElement('span');tag.className='user-tag you';tag.textContent='YOU · OWNER';nameRow.appendChild(tag);}
     const email = document.createElement('div');email.className='user-email';email.textContent=u.email;
-    info.appendChild(nameRow);info.appendChild(email);row.appendChild(info);
+    info.appendChild(nameRow);info.appendChild(email);
+
+    if(!isYou){
+      const perms=u.permissions||{};
+      const permDiv=document.createElement('div');permDiv.className='perm-row';
+      PANELS.forEach(p=>{
+        const lbl=document.createElement('label');
+        lbl.className='perm-label'+(perms[p.key]?' checked':'');
+        const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!perms[p.key];
+        cb.addEventListener('change',()=>{
+          updatePermission(uid, p.key, cb.checked);
+          lbl.classList.toggle('checked',cb.checked);
+        });
+        lbl.appendChild(cb);
+        lbl.appendChild(document.createTextNode(' '+p.label));
+        permDiv.appendChild(lbl);
+      });
+      info.appendChild(permDiv);
+    }
+
+    row.appendChild(info);
     if(!isYou){
       const btn = document.createElement('button');btn.className='abtn danger';btn.textContent='REMOVE';
       btn.addEventListener('click',()=>removeUser(uid, u.email));
@@ -292,14 +333,22 @@ async function addUser(){
     const data = await res.json();
     if(data.error) throw new Error(data.error.message);
     const uid = data.localId;
+    const perms={
+      draft2:document.getElementById('add-perm-draft2').checked,
+      rekkles:document.getElementById('add-perm-rekkles').checked,
+      lrtribute:document.getElementById('add-perm-lrtribute').checked
+    };
     // Store in /admins so admin.html recognises them
     await new Promise((resolve,reject)=>waitFB(()=>{
       window._set(window._ref(window._db,'admins/'+uid),{
-        email, displayName:'', createdAt:Date.now()
+        email, displayName:'', createdAt:Date.now(), permissions:perms
       }).then(resolve).catch(reject);
     }));
     document.getElementById('u-email').value='';
     document.getElementById('u-pw').value='';
+    document.getElementById('add-perm-draft2').checked=true;
+    document.getElementById('add-perm-rekkles').checked=false;
+    document.getElementById('add-perm-lrtribute').checked=false;
     toast('User added — '+email);
   }catch(e){
     const msg = e.message||'';
@@ -310,6 +359,14 @@ async function addUser(){
     : 'Failed: '+msg
     );
   }
+}
+
+function updatePermission(uid, panel, allowed){
+  waitFB(()=>{
+    window._update(window._ref(window._db,'admins/'+uid+'/permissions'),{[panel]:allowed})
+      .then(()=>toast(panel.toUpperCase()+' access '+(allowed?'granted':'revoked')))
+      .catch(()=>toast('Failed to update permission'));
+  });
 }
 
 async function removeUser(uid, email){

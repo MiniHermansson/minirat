@@ -391,9 +391,31 @@ const DEFAULT_TYPES=[
 function onFbReady(cb){if(window._fbReady)cb();else document.addEventListener('fb-ready',cb,{once:true});}
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
+function checkPanelAccess(uid, email, panel){
+  return new Promise(resolve=>{
+    onFbReady(()=>{
+      const unsub=window._onValue(window._ref(window._db,'admins/'+uid),snap=>{
+        unsub();
+        if(!snap.exists()){resolve(false);return;}
+        if(email==='jesperhermansson94@gmail.com'){resolve(true);return;}
+        const data=snap.val();
+        resolve(!!(data.permissions && data.permissions[panel]));
+      },()=>{resolve(false);});
+    });
+  });
+}
+
 onFbReady(()=>{
-  window._onAuth(window._auth,user=>{
+  window._onAuth(window._auth,async user=>{
     if(user){
+      const allowed=await checkPanelAccess(user.uid, user.email, 'rekkles');
+      if(!allowed){
+        const errEl=document.getElementById('login-err');
+        errEl.textContent='You do not have access to the Rekkles panel.';
+        errEl.style.display='block';
+        await window._signOut(window._auth);
+        return;
+      }
       currentUser=user;
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('admin-panel').classList.remove('hidden');

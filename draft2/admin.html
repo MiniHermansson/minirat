@@ -517,8 +517,8 @@ async function submitNameModal(){
   }catch(e){toast('Failed to update name');console.warn(e);}
 }
 
-// Returns 'allowed' (known user), 'new' (not yet registered), or 'blocked'
-function checkAdminAccess(uid){
+// Returns 'allowed' (known user), 'new' (not yet registered), 'blocked', or 'no-permission'
+function checkAdminAccess(uid, email){
   return new Promise(resolve=>{
     waitFB(()=>{
       const unsub1=window._onValue(
@@ -528,7 +528,15 @@ function checkAdminAccess(uid){
           if(snapB.exists()){resolve('blocked');return;}
           const unsub2=window._onValue(
             window._ref(window._db,'admins/'+uid),
-            snapA=>{ unsub2(); resolve(snapA.exists()?'allowed':'new'); },
+            snapA=>{
+              unsub2();
+              if(!snapA.exists()){resolve('new');return;}
+              // Owner always has full access
+              if(email==='jesperhermansson94@gmail.com'){resolve('allowed');return;}
+              const data=snapA.val();
+              if(data.permissions && data.permissions.draft2){resolve('allowed');}
+              else{resolve('no-permission');}
+            },
             _err=>{ resolve('new'); }
           );
         },
@@ -539,9 +547,14 @@ function checkAdminAccess(uid){
 }
 
 async function onSignedIn(user){
-  const access=await checkAdminAccess(user.uid);
+  const access=await checkAdminAccess(user.uid, user.email);
   if(access==='blocked'){
     document.getElementById('l-err').textContent='Access denied — contact your administrator.';
+    await window._signOut(window._auth);
+    return;
+  }
+  if(access==='no-permission'){
+    document.getElementById('l-err').textContent='You do not have access to the Draft panel.';
     await window._signOut(window._auth);
     return;
   }
