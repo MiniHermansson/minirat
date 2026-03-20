@@ -517,7 +517,6 @@ async function submitNameModal(){
   }catch(e){toast('Failed to update name');console.warn(e);}
 }
 
-// Returns 'allowed' (known user), 'new' (not yet registered), 'blocked', or 'no-permission'
 function checkAdminAccess(uid, email){
   return new Promise(resolve=>{
     waitFB(()=>{
@@ -530,17 +529,15 @@ function checkAdminAccess(uid, email){
             window._ref(window._db,'admins/'+uid),
             snapA=>{
               unsub2();
-              if(!snapA.exists()){resolve('new');return;}
-              // Owner always has full access
+              if(!snapA.exists()){resolve('denied');return;}
               if(email==='jesperhermansson94@gmail.com'){resolve('allowed');return;}
               const data=snapA.val();
-              if(data.permissions && data.permissions.draft2){resolve('allowed');}
-              else{resolve('no-permission');}
+              resolve(data.permissions && data.permissions.draft2 ? 'allowed' : 'denied');
             },
-            _err=>{ resolve('new'); }
+            _err=>{ resolve('denied'); }
           );
         },
-        _err=>{ resolve('new'); }
+        _err=>{ resolve('denied'); }
       );
     });
   });
@@ -548,13 +545,10 @@ function checkAdminAccess(uid, email){
 
 async function onSignedIn(user){
   const access=await checkAdminAccess(user.uid, user.email);
-  if(access==='blocked'){
-    document.getElementById('l-err').textContent='Access denied — contact your administrator.';
-    await window._signOut(window._auth);
-    return;
-  }
-  if(access==='no-permission'){
-    document.getElementById('l-err').textContent='You do not have access to the Draft panel.';
+  if(access!=='allowed'){
+    document.getElementById('l-err').textContent=
+      access==='blocked'?'Access denied — contact your administrator.'
+      :'You do not have access to the Draft panel.';
     await window._signOut(window._auth);
     return;
   }
@@ -570,14 +564,6 @@ async function onSignedIn(user){
   // Record session start time — only show chat messages from this session onward
   if(!sessionStorage.getItem('chatSessionStart')){
     sessionStorage.setItem('chatSessionStart', Date.now());
-  }
-  // Auto-register user into /admins if not already there (handles existing accounts)
-  if(access==='new'){
-    waitFB(()=>{
-      window._set(window._ref(window._db,'admins/'+user.uid),{
-        email:user.email,displayName:user.displayName||'',createdAt:Date.now()
-      }).catch(()=>{});
-    });
   }
   setupPresence(user);
   listenPresence();
